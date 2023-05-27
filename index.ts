@@ -1,9 +1,11 @@
 // Require the necessary discord.js classes
-import { Client, Events, GatewayIntentBits } from 'discord.js';
+import { Events, GatewayIntentBits } from 'discord.js';
 import { AppConfig } from './src/AppConfig';
+import { DiscordClient } from './src/common/DiscordClient';
 
 // Create a new client instance
-const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+const client = new DiscordClient({ intents: [GatewayIntentBits.Guilds] });
+// initialize function to get all commands
 
 // When the client is ready, run this code (only once)
 // We use 'c' for the event parameter to keep it separate from the already defined 'client'
