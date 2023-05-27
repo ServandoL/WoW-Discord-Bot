@@ -1,4 +1,3 @@
-import { Collection } from 'discord.js';
 import { SlashCommand } from './SlashCommand';
 import { Ping } from './Ping';
 import { Server } from './Server';
