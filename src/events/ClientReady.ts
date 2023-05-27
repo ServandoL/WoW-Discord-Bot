@@ -1,6 +1,6 @@
 import { Events } from 'discord.js';
 import { type DiscordClient } from '../common/DiscordClient';
-import { DiscordEvent } from './DiscordEvent';
+import { DiscordEvent } from './class/DiscordEvent';
 
 export class ClientReady extends DiscordEvent {
   protected _name: string;

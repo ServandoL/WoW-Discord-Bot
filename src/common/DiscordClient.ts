@@ -1,7 +1,7 @@
 import { Client, type ClientOptions, Collection, GatewayIntentBits } from 'discord.js';
-import { type SlashCommand } from '../commands/SlashCommand';
+import { type SlashCommand } from '../commands/class/SlashCommand';
 import { Commands } from '../commands/Commands';
-import { type DiscordEvent } from '../events/DiscordEvent';
+import { type DiscordEvent } from '../events/class/DiscordEvent';
 import { Events } from '../events/Events';
 
 export class DiscordClient extends Client {

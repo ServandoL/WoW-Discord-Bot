@@ -1,4 +1,4 @@
-import { type SlashCommand } from './SlashCommand';
+import { type SlashCommand } from './class/SlashCommand';
 import { Ping } from './Ping';
 import { Server } from './Server';
 import { User } from './User';

@@ -1,6 +1,6 @@
 import { ClientInteractionCreate } from './ClientInteractionCreate';
 import { ClientReady } from './ClientReady';
-import { type DiscordEvent } from './DiscordEvent';
+import { type DiscordEvent } from './class/DiscordEvent';
 
 export class Events {
   private static _instance: Events;
