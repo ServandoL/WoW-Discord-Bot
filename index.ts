@@ -1,4 +1,3 @@
-// Require the necessary discord.js classes
 import { GatewayIntentBits } from 'discord.js';
 import { AppConfig } from './src/AppConfig';
 import { DiscordClient } from './src/common/DiscordClient';
@@ -20,7 +19,7 @@ DiscordClient.instance.events.forEach((ev) => {
   }
 });
 
-// Log in to Discord with your client's token
+// Log in to Discord with client token
 DiscordClient.instance.login(AppConfig.instance.token).catch((error) => {
   console.error('An error occurred while the bot was trying to log in.');
   throw new Error(error);
