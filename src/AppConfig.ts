@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/space-before-function-paren */
 export class AppConfig {
   private static _instance: AppConfig;
   private readonly _token: string;
