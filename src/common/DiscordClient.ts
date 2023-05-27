@@ -1,13 +1,13 @@
-import { Client, ClientOptions, Collection, GatewayIntentBits } from 'discord.js';
-import { SlashCommand } from '../commands/SlashCommand';
+import { Client, type ClientOptions, Collection, GatewayIntentBits } from 'discord.js';
+import { type SlashCommand } from '../commands/SlashCommand';
 import { Commands } from '../commands/Commands';
-import { DiscordEvent } from '../events/DiscordEvent';
+import { type DiscordEvent } from '../events/DiscordEvent';
 import { Events } from '../events/Events';
 
 export class DiscordClient extends Client {
   private static _instance: DiscordClient;
-  private _commands: Collection<string, SlashCommand>;
-  private _events: DiscordEvent[];
+  private readonly _commands: Collection<string, SlashCommand>;
+  private readonly _events: DiscordEvent[];
 
   constructor(options?: ClientOptions) {
     const clientOptions: ClientOptions = options ?? { intents: [GatewayIntentBits.Guilds] };
@@ -16,7 +16,7 @@ export class DiscordClient extends Client {
     this._events = [];
   }
 
-  public initialize() {
+  public initialize(): void {
     const slashCommands = new Commands();
     const discordEvents = new Events();
     const events = discordEvents.initialize();
@@ -25,11 +25,11 @@ export class DiscordClient extends Client {
     commands.forEach((command) => this._commands.set(command.data.name, command));
   }
 
-  public static start(options?: ClientOptions) {
+  public static start(options?: ClientOptions): void {
     DiscordClient._instance = new DiscordClient(options);
   }
 
-  public get events() {
+  public get events(): DiscordEvent[] {
     return DiscordClient.instance._events;
   }
 
@@ -37,12 +37,12 @@ export class DiscordClient extends Client {
     return DiscordClient.instance._commands;
   }
 
-  public getCommand(name: string) {
+  public getCommand(name: string): SlashCommand | undefined {
     return DiscordClient.instance._commands.get(name);
   }
 
-  public static get instance() {
-    if (!DiscordClient._instance) {
+  public static get instance(): DiscordClient {
+    if (DiscordClient._instance === undefined || DiscordClient === null) {
       DiscordClient._instance = new DiscordClient();
       DiscordClient.instance.initialize();
     }

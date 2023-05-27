@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/space-before-function-paren */
 export class AppConfig {
   private static _instance: AppConfig;
-  private _token: string;
-  private _clientId: string;
-  private _guildId: string;
+  private readonly _token: string;
+  private readonly _clientId: string;
+  private readonly _guildId: string;
 
   constructor() {
     this._token = process.env.DISCORD_TOKEN ?? '';
@@ -10,22 +11,22 @@ export class AppConfig {
     this._guildId = process.env.GUILD_ID ?? '';
   }
 
-  public static get instance() {
-    if (!AppConfig._instance) {
+  public static get instance(): AppConfig {
+    if (AppConfig._instance === undefined || AppConfig._instance === null) {
       AppConfig._instance = new AppConfig();
     }
     return AppConfig._instance;
   }
 
-  public get clientId() {
+  public get clientId(): string {
     return AppConfig.instance._clientId;
   }
 
-  public get guildId() {
+  public get guildId(): string {
     return AppConfig.instance._guildId;
   }
 
-  public get token() {
+  public get token(): string {
     return AppConfig.instance._token;
   }
 }

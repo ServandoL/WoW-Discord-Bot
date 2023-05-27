@@ -1,4 +1,4 @@
-import { Interaction, SlashCommandBuilder } from 'discord.js';
+import { type Interaction, type SlashCommandBuilder } from 'discord.js';
 
 export abstract class SlashCommand {
   abstract data: SlashCommandBuilder;

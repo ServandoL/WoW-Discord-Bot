@@ -1,4 +1,4 @@
-import { REST, RESTPostAPIChatInputApplicationCommandsJSONBody, Routes } from 'discord.js';
+import { REST, type RESTPostAPIChatInputApplicationCommandsJSONBody, Routes } from 'discord.js';
 import { DiscordClient } from './common/DiscordClient';
 import { AppConfig } from './AppConfig';
 
@@ -13,11 +13,13 @@ const rest = new REST().setToken(AppConfig.instance.token);
     const data = await rest.put(
       Routes.applicationGuildCommands(AppConfig.instance.clientId, AppConfig.instance.guildId),
       {
-        body: commands,
+        body: commands
       }
     );
     console.log(`Successfully reloaded ${(data as any[]).length} application (/) commands.`);
   } catch (error) {
     console.error(`An error occurred: ${JSON.stringify(error)}`);
   }
-})();
+})().catch((error) => {
+  console.error(`Rest call failed: ${JSON.stringify(error)}`);
+});

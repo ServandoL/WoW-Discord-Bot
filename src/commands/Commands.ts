@@ -1,17 +1,17 @@
-import { SlashCommand } from './SlashCommand';
+import { type SlashCommand } from './SlashCommand';
 import { Ping } from './Ping';
 import { Server } from './Server';
 import { User } from './User';
 
 export class Commands {
   private static _instance: Commands;
-  constructor() {}
-  public static get instance() {
-    if (!Commands._instance) {
+  public static get instance(): Commands {
+    if (Commands._instance === undefined || Commands._instance === null) {
       Commands._instance = new Commands();
     }
     return Commands._instance;
   }
+
   public initialize(): SlashCommand[] {
     return [new Ping(), new Server(), new User()];
   }
