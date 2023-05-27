@@ -22,4 +22,5 @@ const rest = new REST().setToken(AppConfig.instance.token);
   }
 })().catch((error) => {
   console.error(`Rest call failed: ${JSON.stringify(error)}`);
+  throw new Error(error);
 });

@@ -7,7 +7,7 @@ import { DiscordClient } from './src/common/DiscordClient';
 DiscordClient.start({ intents: [GatewayIntentBits.Guilds] });
 // initialize function to get all commands
 DiscordClient.instance.initialize();
-
+// handle events
 DiscordClient.instance.events.forEach((ev) => {
   if (ev.once !== undefined) {
     DiscordClient.instance.once(ev.name, async (...args) => {
