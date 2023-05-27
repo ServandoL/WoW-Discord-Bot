@@ -26,7 +26,7 @@ export class DiscordClient extends Client {
     commands.forEach((command) => this._commands.set(command.data.name, command));
   }
 
-  public start(options?: ClientOptions) {
+  public static start(options?: ClientOptions) {
     DiscordClient._instance = new DiscordClient(options);
   }
 

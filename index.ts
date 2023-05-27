@@ -4,7 +4,7 @@ import { AppConfig } from './src/AppConfig';
 import { DiscordClient } from './src/common/DiscordClient';
 
 // Create a new client instance
-DiscordClient.instance.start({ intents: [GatewayIntentBits.Guilds] });
+DiscordClient.start({ intents: [GatewayIntentBits.Guilds] });
 // initialize function to get all commands
 DiscordClient.instance.initialize();
 

@@ -13,8 +13,9 @@ export class ClientInteractionCreate extends DiscordEvent {
     }
     try {
       await command.execute(interaction);
+      console.info(`${this.name}: ${interaction.commandName} executed successfully.`);
     } catch (error) {
-      console.error(`An error occurred: ${JSON.stringify(error)}`);
+      console.error(`${this.name}: ${interaction.commandName} - An error occurred: ${JSON.stringify(error)}`);
       if (interaction.replied || interaction.deferred) {
         await interaction.followUp({
           content: `There was an error while executing this command!`,

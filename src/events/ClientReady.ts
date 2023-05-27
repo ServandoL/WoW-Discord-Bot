@@ -6,7 +6,7 @@ export class ClientReady extends DiscordEvent {
   protected _name: string;
   protected _once: boolean;
   async execute(client: DiscordClient): Promise<void> {
-    console.log(`Ready! Logged in as ${client.user?.tag}`);
+    console.info(`Ready! Logged in as ${client.user?.tag}`);
   }
   constructor() {
     super();
