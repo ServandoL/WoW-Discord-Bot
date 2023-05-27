@@ -8,6 +8,7 @@
     "build": "npx tsc",
     "debug": "npx tsc && env-cmd node --inspect dist/index.js",
     "dev": "nodemon index.ts",
+    "commands": "nodemon src/deploy.commands.ts",
     "format": "npx prettier --write src",
     "lint": "npx eslint src",
     "test": "echo \"Error: no test specified\" && exit 1"
