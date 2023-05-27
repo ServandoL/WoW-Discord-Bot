@@ -10,7 +10,7 @@
     "dev": "nodemon index.ts",
     "commands": "nodemon src/deploy.commands.ts",
     "format": "npx prettier --write src",
-    "lint": "npx eslint src",
+    "lint": "npx eslint index.ts src",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
