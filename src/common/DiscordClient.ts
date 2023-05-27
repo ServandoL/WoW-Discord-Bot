@@ -3,7 +3,6 @@ import { SlashCommand } from '../commands/SlashCommand';
 import { Commands } from '../commands/Commands';
 import { DiscordEvent } from '../events/DiscordEvent';
 import { Events } from '../events/Events';
-import { ClientReady } from '../events/ClientReady';
 
 export class DiscordClient extends Client {
   private static _instance: DiscordClient;
