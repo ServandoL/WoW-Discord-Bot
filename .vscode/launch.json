@@ -10,7 +10,8 @@
       "name": "Launch Program",
       "skipFiles": ["<node_internals>/**"],
       "runtimeArgs": ["-r", "ts-node/register"],
-      "args": ["${workspaceFolder}/index.ts"]
+      "args": ["${workspaceFolder}/index.ts"],
+      "envFile": "${workspaceFolder}/.env"
     }
   ]
 }
