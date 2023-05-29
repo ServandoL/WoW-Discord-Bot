@@ -5,6 +5,7 @@ export class AppConfig {
   private readonly _discordGuildId: string;
   private readonly _bnetClientId: string;
   private readonly _bnetSecret: string;
+  private readonly _bnetTokenHost: string;
 
   constructor() {
     this._discordToken = process.env.DISCORD_TOKEN ?? '';
@@ -12,6 +13,7 @@ export class AppConfig {
     this._discordGuildId = process.env.DISCORD_GUILD_ID ?? '';
     this._bnetClientId = process.env.BNET_CLIENT_ID ?? '';
     this._bnetSecret = process.env.BNET_SECRET ?? '';
+    this._bnetTokenHost = process.env.BNET_TOKEN_HOST ?? '';
   }
 
   public static get instance(): AppConfig {
@@ -19,6 +21,10 @@ export class AppConfig {
       AppConfig._instance = new AppConfig();
     }
     return AppConfig._instance;
+  }
+
+  public get bnetTokenHost(): string {
+    return AppConfig.instance._bnetTokenHost;
   }
 
   public get bnetClientId(): string {

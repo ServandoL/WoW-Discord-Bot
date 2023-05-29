@@ -39,6 +39,7 @@
     "space-before-blocks": "error",
     "space-before-function-paren": "off",
     "@typescript-eslint/space-before-function-paren": "off",
+    "@typescript-eslint/member-delimiter-style": "off",
     "space-in-parens": "error",
     "space-infix-ops": "error",
     "space-unary-ops": "error",
