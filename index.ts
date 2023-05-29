@@ -1,9 +1,11 @@
 import { GatewayIntentBits } from 'discord.js';
 import { AppConfig } from './src/AppConfig';
 import { DiscordClient } from './src/common/DiscordClient';
+import BnetStrategy from 'passport-bnet';
 
 // Create a new client instance
 DiscordClient.start({ intents: [GatewayIntentBits.Guilds] });
+
 // initialize function to get all commands
 DiscordClient.instance.initialize();
 // handle events
