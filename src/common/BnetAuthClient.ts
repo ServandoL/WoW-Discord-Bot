@@ -1,5 +1,5 @@
 import { AppConfig } from '../AppConfig';
-import { type OAuthOptions } from '../interfaces/AuthToken';
+import { type OAuthOptions } from '../types/AuthToken';
 import { AuthContext } from './AuthContext';
 
 export class BnetAuthClient extends AuthContext {

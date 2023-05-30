@@ -1,4 +1,4 @@
-import { type ApplicationConfiguration } from './interfaces/interfaces';
+import { type ApplicationConfiguration } from './types/interfaces';
 
 export class AppConfig {
   private static _instance: AppConfig;

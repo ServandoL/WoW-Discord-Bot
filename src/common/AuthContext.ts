@@ -1,4 +1,4 @@
-import { type OAuthOptions } from '../interfaces/AuthToken';
+import { type OAuthOptions } from '../types/AuthToken';
 import oauth2 from 'simple-oauth2';
 
 export class AuthContext {

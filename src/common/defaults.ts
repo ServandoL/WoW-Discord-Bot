@@ -1,5 +1,5 @@
 import { type APIApplicationCommandOptionChoice } from 'discord.js';
-import { FactChoice } from '../interfaces/interfaces';
+import { FactChoice } from '../types/interfaces';
 
 export const RANDOM_CHOICES: Array<APIApplicationCommandOptionChoice<number>> = [
   {
