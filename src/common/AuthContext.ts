@@ -23,6 +23,10 @@ export class AuthContext {
       throw new Error(message);
     }
   }
+
+  public get token(): oauth2.AccessToken | undefined {
+    return this._token;
+  }
 }
 
 // curl -u {client_id}:{client_secret} -d grant_type=client_credentials https://oauth.battle.net/token
