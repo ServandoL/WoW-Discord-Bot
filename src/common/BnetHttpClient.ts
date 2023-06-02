@@ -24,7 +24,7 @@ export class BnetHttpClient extends AuthContext {
     const { body } = await request(url, {
       headers: {
         'Battlenet-Namespace': 'static-us',
-        authorization: `Bearer ${token.access_token as string}`
+        authorization: `Bearer ${token?.access_token as string}`
       }
     });
     return await body.json();
