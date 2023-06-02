@@ -14,18 +14,23 @@ export class ClientInteractionCreate extends DiscordEvent {
     try {
       await command.execute(interaction);
       console.info(`${this.name}: ${interaction.commandName} executed successfully.`);
-    } catch (error) {
-      console.error(`${this.name}: ${interaction.commandName} - An error occurred: ${JSON.stringify(error)}`);
+    } catch (error: any) {
+      const errorMsg = `${this.name}: ${interaction.commandName} - An error occurred: ${JSON.stringify({
+        error: error.message
+      })}`;
+      console.error(errorMsg);
       if (interaction.replied || interaction.deferred) {
         await interaction.followUp({
           content: 'There was an error while executing this command!',
           ephemeral: true
         });
+        console.error(errorMsg);
       } else {
         await interaction.reply({
           content: 'There was an error while executing this command!',
           ephemeral: true
         });
+        console.error(errorMsg);
       }
     }
   }

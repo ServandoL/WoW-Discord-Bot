@@ -1,10 +1,10 @@
 import { GatewayIntentBits } from 'discord.js';
 import { AppConfig } from './src/AppConfig';
 import { DiscordClient } from './src/common/DiscordClient';
-import { BnetAuthClient } from './src/common/BnetAuthClient';
+import { BnetHttpClient } from './src/common/BnetHttpClient';
 
 // Create the battle.net auth client instance
-BnetAuthClient.start();
+BnetHttpClient.start();
 
 // Create a new client instance
 DiscordClient.start({ intents: [GatewayIntentBits.Guilds] });

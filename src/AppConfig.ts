@@ -23,6 +23,10 @@ export class AppConfig {
     return AppConfig._instance;
   }
 
+  public get bnetApi(): string {
+    return AppConfig.instance._applicationConfigs.bnetApi;
+  }
+
   public get bnetTokenHost(): string {
     return AppConfig.instance._applicationConfigs.bnetTokenHost;
   }
