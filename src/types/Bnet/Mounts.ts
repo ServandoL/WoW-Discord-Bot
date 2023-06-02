@@ -1,4 +1,11 @@
-import { type BnetApiKeyId, type BnetApiTypeName, type BnetApiSelf, type BnetApiRequirements } from './interfaces';
+import { type KeyValuePair } from '../interfaces';
+import {
+  type BnetApiSelf,
+  type BnetApiKeyId,
+  type BnetApiTypeName,
+  type BnetApiRequirements,
+  type BnetApiLocale
+} from './Common';
 
 export interface MountIndex {
   key: {
@@ -24,17 +31,7 @@ export interface MountByIdApiResponse {
   requirements: BnetApiRequirements;
 }
 
-export interface BnetApiLocale {
-  en_US: string;
-  [key: string]: string;
-}
-
 export interface MountDisplay {
   _links: BnetApiSelf;
   assets: KeyValuePair[];
-}
-
-export interface KeyValuePair {
-  key: string;
-  value: string;
 }

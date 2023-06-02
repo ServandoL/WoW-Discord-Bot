@@ -1,5 +1,3 @@
-import { type BnetApiLocale } from './Mounts';
-
 export enum FactChoice {
   ACHIEVEMENTS,
   CREATURE,
@@ -29,31 +27,13 @@ export interface ApplicationConfiguration {
   bnetApi: string;
 }
 
-export interface BnetApiSelf {
-  _links: {
-    self: {
-      href: string;
-    };
-  };
-}
-
-export interface BnetApiKeyId {
-  key: {
-    href: string;
-  };
-  id: number;
-}
-
-export interface BnetApiTypeName {
-  type: string;
-  name: BnetApiLocale;
-}
-
-export interface BnetApiRequirements {
-  faction: BnetApiTypeName;
-}
 export interface EmbedBuilderFields {
   name: string;
   value: string;
   inline?: boolean;
+}
+
+export interface KeyValuePair {
+  key: string;
+  value: string;
 }

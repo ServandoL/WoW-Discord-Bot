@@ -4,7 +4,9 @@ import { RANDOM_CHOICES } from '../common/defaults';
 import { type EmbedBuilderFields, FactChoice } from '../types/interfaces';
 import { BnetHttpClient } from '../common/BnetHttpClient';
 import { AppConfig } from '../AppConfig';
-import { type MountDisplay, type MountByIdApiResponse, type MountIndexApiResponse } from '../types/Mounts';
+import { type MountDisplay, type MountByIdApiResponse, type MountIndexApiResponse } from '../types/Bnet/Mounts';
+import { type AchievementByIdApiResponse, type AchievementsIndexApiResponse } from '../types/Bnet/Achievements';
+import { type BnetMediaDisplay } from '../types/Bnet/Common';
 
 export class SelectRandomWoWFact extends SlashCommand {
   data: SlashCommandBuilder;
@@ -13,8 +15,58 @@ export class SelectRandomWoWFact extends SlashCommand {
     const target = interaction.options.getNumber('category');
     const baseUrl = AppConfig.instance.bnetApi;
     await interaction.deferReply();
+    const embeddedResponse = new EmbedBuilder();
     switch (target) {
       case FactChoice.ACHIEVEMENTS:
+        {
+          const achievementsIndex: AchievementsIndexApiResponse = await BnetHttpClient.instance.get(
+            `${baseUrl}/data/wow/achievement/index`
+          );
+          const randomAchievement =
+            achievementsIndex.achievements[Math.floor(Math.random() * achievementsIndex.achievements.length)];
+          console.info(`Calling ${randomAchievement.key.href}`);
+          const achievementById: AchievementByIdApiResponse = await BnetHttpClient.instance.get(
+            randomAchievement.key.href
+          );
+          const achievementDisplay: BnetMediaDisplay | undefined = achievementById.media.key.href
+            ? await BnetHttpClient.instance.get(achievementById.media.key.href)
+            : undefined;
+          if (typeof randomAchievement.name !== 'string' && randomAchievement.name?.en_US) {
+            embeddedResponse.setTitle(randomAchievement.name.en_US);
+          }
+          if (achievementById?.description?.en_US) {
+            embeddedResponse.setDescription(achievementById.description.en_US);
+          }
+          if (achievementDisplay && achievementDisplay.assets.length > 0) {
+            embeddedResponse.setImage(achievementDisplay.assets[0].value);
+          }
+          const fields: EmbedBuilderFields[] = [];
+          if (
+            achievementById.category?.name &&
+            typeof achievementById.category.name !== 'string' &&
+            achievementById.category.name.en_US
+          ) {
+            fields.push({
+              name: 'CATEGORY',
+              value: achievementById.category.name.en_US,
+              inline: true
+            });
+          }
+          if (achievementById.points !== undefined || achievementById.points !== null) {
+            fields.push({
+              name: 'POINTS',
+              value: achievementById.points.toString(),
+              inline: true
+            });
+          }
+          if (achievementById.next_achievement && typeof achievementById.next_achievement.name !== 'string') {
+            fields.push({
+              name: 'NEXT ACHIEVEMENT',
+              value: achievementById.next_achievement.name?.en_US ?? '',
+              inline: true
+            });
+          }
+        }
         break;
       case FactChoice.CREATURE:
         break;
@@ -35,7 +87,6 @@ export class SelectRandomWoWFact extends SlashCommand {
           const mountDisplay: MountDisplay | undefined = mountById.creature_displays.length
             ? await BnetHttpClient.instance.get(mountById.creature_displays[0].key.href)
             : undefined;
-          const embeddedResponse = new EmbedBuilder();
           if (randomMount.name.en_US) {
             embeddedResponse.setTitle(randomMount.name.en_US);
           }
@@ -70,7 +121,6 @@ export class SelectRandomWoWFact extends SlashCommand {
           if (fields.length > 0) {
             embeddedResponse.addFields(...fields);
           }
-          await interaction.editReply({ embeds: [embeddedResponse] });
         }
         break;
       case FactChoice.PET:
@@ -97,6 +147,7 @@ export class SelectRandomWoWFact extends SlashCommand {
         console.warn(`${interaction.commandName}: ${target?.toString() ?? ''} is not a valid entry.`);
         await interaction.reply('Your entry is not valid. Please try again');
     }
+    await interaction.editReply({ embeds: [embeddedResponse] });
   }
 
   constructor() {
