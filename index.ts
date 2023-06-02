@@ -15,11 +15,19 @@ DiscordClient.instance.initialize();
 DiscordClient.instance.events.forEach((ev) => {
   if (ev.once !== undefined) {
     DiscordClient.instance.once(ev.name, async (...args) => {
-      await ev.execute(...args);
+      try {
+        await ev.execute(...args);
+      } catch (error: any) {
+        console.error(JSON.stringify(error));
+      }
     });
   } else {
     DiscordClient.instance.on(ev.name, async (...args) => {
-      await ev.execute(...args);
+      try {
+        await ev.execute(...args);
+      } catch (error) {
+        console.error(JSON.stringify(error));
+      }
     });
   }
 });

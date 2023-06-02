@@ -10,7 +10,7 @@ export class AuthContext {
     this._scope = scope;
   }
 
-  async getToken(): Promise<oauth2.Token | undefined> {
+  async getToken(): Promise<oauth2.Token> {
     try {
       if (this._token === null || this._token === undefined || this._token.expired()) {
         const token = await this._client.getToken(this._scope);
@@ -20,6 +20,7 @@ export class AuthContext {
     } catch (error) {
       const message = `AuthContext: Access Token error: ${JSON.stringify(error)}`;
       console.error(message);
+      throw new Error(message);
     }
   }
 
