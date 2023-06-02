@@ -22,7 +22,8 @@ export interface BnetApiTypeName {
 }
 
 export interface BnetApiRequirements {
-  faction: BnetApiTypeName;
+  faction?: BnetApiTypeName;
+  level?: BnetApiLocale;
 }
 
 export interface BnetApiLocale {
