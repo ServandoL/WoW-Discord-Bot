@@ -21,6 +21,8 @@ export const ItemSubclass = {
   SWORD: 'Sword'
 };
 
+export type ItemByIdApiResponse = BnetItem;
+
 export interface BnetItem {
   _links: BnetApiSelf;
   id: number;
@@ -56,7 +58,7 @@ export interface PreviewItem {
   set?: ItemSet;
   unique_equipped?: BnetApiLocale;
   limit_category?: BnetApiLocale;
-  spell?: Spell[];
+  spells?: Spell[];
   socket_bonus?: BnetApiLocale;
   name_description: ItemStatsDisplay;
   sockets?: Socket[];
@@ -64,6 +66,8 @@ export interface PreviewItem {
   upgrades: ItemUpgrades;
   requirements: BnetApiRequirements;
   level: ItemLevel;
+  is_subclass_hidden: boolean;
+  toy?: BnetApiLocale;
 }
 
 export interface Socket {

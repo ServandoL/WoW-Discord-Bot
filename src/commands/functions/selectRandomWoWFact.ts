@@ -16,8 +16,74 @@ import {
   type QuestByIdApiResponse,
   type QuestIndexApiResponse
 } from '../../types/Bnet/Quests';
+import { type TitleByIdApiResponse, type TitleIndexApiResponse } from '../../types/Bnet/Titles';
+import { type ToyByIdApiResponse, type ToyIndexApiResponse } from '../../types/Bnet/Toy';
+import { type ItemByIdApiResponse } from '../../types/Bnet/Item';
 
 const baseUrl = AppConfig.instance.bnetApi;
+
+export async function getToy(embeddedResponse: EmbedBuilder): Promise<void> {
+  const toyIndex: ToyIndexApiResponse = await BnetHttpClient.instance.get(`${baseUrl}/data/wow/toy/index`);
+  const randomToy = getRandomArrayElement(toyIndex.toys);
+  console.info(`Calling ${randomToy.key.href}`);
+  const toyById: ToyByIdApiResponse = await BnetHttpClient.instance.get(randomToy.key.href);
+  const toyDisplay: BnetMediaDisplay | undefined = await BnetHttpClient.instance.get(toyById.media.key.href);
+  const itemById: ItemByIdApiResponse = await BnetHttpClient.instance.get(toyById.item.key.href);
+  const toyName = typeof toyById.item.name === 'string' ? toyById.item.name : toyById.item.name?.en_US ?? 'NO DATA';
+  embeddedResponse.setTitle(`TOY\n${toyName}`);
+  if (toyById.source_description) {
+    embeddedResponse.setDescription(toyById.source_description.en_US);
+  }
+  if (toyDisplay?.assets && toyDisplay.assets.length > 0) {
+    embeddedResponse.setImage(toyDisplay.assets[0].value);
+  }
+  const descriptions: string[] = [];
+  if (itemById.preview_item.spells && itemById.preview_item.spells.length > 0) {
+    itemById.preview_item.spells.forEach((spell) => {
+      descriptions.push(spell.description.en_US);
+    });
+  }
+  embeddedResponse.addFields(
+    {
+      name: 'SOURCE',
+      value: toyById.source.type,
+      inline: true
+    },
+    {
+      name: 'QUALITY',
+      value: itemById.quality.type,
+      inline: true
+    }
+  );
+  if (descriptions.length > 0) {
+    embeddedResponse.addFields({
+      name: 'DESCRIPTION',
+      value: descriptions.join('\n')
+    });
+  }
+}
+
+export async function getTitle(embeddedResponse: EmbedBuilder): Promise<void> {
+  const titleIndex: TitleIndexApiResponse = await BnetHttpClient.instance.get(`${baseUrl}/data/wow/title/index`);
+  const randomTitle = getRandomArrayElement(titleIndex.titles);
+  console.info(`Calling ${randomTitle.key.href}`);
+  const titleById: TitleByIdApiResponse = await BnetHttpClient.instance.get(randomTitle.key.href);
+  embeddedResponse.setTitle('TITLE\n' + titleById.name.en_US);
+  embeddedResponse.setDescription(
+    `Male: ${titleById.gender_name.male.en_US}\nFemale: ${titleById.gender_name.female.en_US}`
+  );
+  embeddedResponse.addFields({
+    name: 'SOURCE',
+    value: titleById.source.type.type
+  });
+  if (titleById.source.achievements && titleById.source.achievements.length > 0) {
+    const achievs = titleById.source.achievements.map((achiev) => achiev.name.en_US);
+    embeddedResponse.addFields({
+      name: 'ACHIEVEMENTS',
+      value: achievs.join('\n')
+    });
+  }
+}
 
 export async function getQuest(embeddedResponse: EmbedBuilder): Promise<void> {
   const questIndex: QuestIndexApiResponse = await BnetHttpClient.instance.get(`${baseUrl}/data/wow/quest/index`);
@@ -31,9 +97,9 @@ export async function getQuest(embeddedResponse: EmbedBuilder): Promise<void> {
   const questAreaName =
     typeof randomQuestArea.name !== 'string' ? randomQuestArea.name?.en_US ?? 'NO DATA' : randomQuestArea.name;
   if (questById.title.en_US) {
-    embeddedResponse.setTitle(`${questById.title.en_US} - ${questAreaName}`);
+    embeddedResponse.setTitle(`QUEST\n${questById.title.en_US} - ${questAreaName}`);
   } else {
-    embeddedResponse.setTitle(questAreaName);
+    embeddedResponse.setTitle('QUEST\n' + questAreaName);
   }
   if (questById.description.en_US) {
     embeddedResponse.setDescription(
@@ -79,7 +145,7 @@ export async function getSpecialization(embeddedResponse: EmbedBuilder): Promise
       typeof specById.playable_class.name !== 'string'
         ? specById.playable_class.name?.en_US ?? 'NO DATA'
         : specById.playable_class.name;
-    embeddedResponse.setTitle(`${specById.name.en_US} ${className} - ${specById.role.type}`);
+    embeddedResponse.setTitle(`SPEC\n${specById.name.en_US} ${className} - ${specById.role.type}`);
   }
   if (specById.gender_description.male) {
     embeddedResponse.setDescription(specById.gender_description.male.en_US);
@@ -111,7 +177,7 @@ export async function getPlayableRace(embeddedResponse: EmbedBuilder): Promise<v
   console.log(`Calling ${randomRace.key.href}`);
   const raceById: RaceByIdApiResponse = await BnetHttpClient.instance.get(randomRace.key.href);
   if (raceById.name.en_US) {
-    embeddedResponse.setTitle(raceById.name.en_US);
+    embeddedResponse.setTitle('RACE\n' + raceById.name.en_US);
   }
   if (raceById.faction.type) {
     embeddedResponse.setDescription(raceById.faction.type);
@@ -146,7 +212,7 @@ export async function getPet(embeddedResponse: EmbedBuilder): Promise<void> {
   const petById: PetByIdApiResponse = await BnetHttpClient.instance.get(randomPet.key.href);
   const petDisplay: BnetMediaDisplay | undefined = await BnetHttpClient.instance.get(petById.media.key.href);
   if (petById.name.en_US) {
-    embeddedResponse.setTitle(petById.name.en_US);
+    embeddedResponse.setTitle('PET\n' + petById.name.en_US);
   }
   if (petById.description.en_US) {
     embeddedResponse.setDescription(petById.description.en_US);
@@ -223,9 +289,9 @@ export async function getHeirloom(embeddedResponse: EmbedBuilder): Promise<void>
   const heirloomDisplay: BnetMediaDisplay | undefined = await BnetHttpClient.instance.get(heirloomById.media.key.href);
   const baseHeirloom = heirloomById.upgrades[0].item;
   if (typeof heirloomById.item.name === 'string') {
-    embeddedResponse.setTitle(heirloomById.item.name);
+    embeddedResponse.setTitle('HEIRLOOM\n' + heirloomById.item.name);
   } else {
-    embeddedResponse.setTitle(heirloomById.item.name?.en_US ?? '');
+    embeddedResponse.setTitle(`HEIRLOOM\n${heirloomById.item.name?.en_US ?? ''}`);
   }
   embeddedResponse.addFields({
     name: 'ITEM LEVEL',
@@ -329,7 +395,7 @@ export async function getMount(embeddedResponse: EmbedBuilder): Promise<void> {
     ? await BnetHttpClient.instance.get(mountById.creature_displays[0].key.href)
     : undefined;
   if (randomMount.name.en_US) {
-    embeddedResponse.setTitle(randomMount.name.en_US);
+    embeddedResponse.setTitle('MOUNT\n' + randomMount.name.en_US);
   }
   if (mountById.description.en_US) {
     embeddedResponse.setDescription(mountById.description.en_US);
@@ -375,7 +441,7 @@ export async function getAchievement(embeddedResponse: EmbedBuilder): Promise<vo
     ? await BnetHttpClient.instance.get(achievementById.media.key.href)
     : undefined;
   if (typeof randomAchievement.name !== 'string' && randomAchievement.name?.en_US) {
-    embeddedResponse.setTitle(randomAchievement.name.en_US);
+    embeddedResponse.setTitle('ACHIEVEMENT\n' + randomAchievement.name.en_US);
   }
   if (achievementById?.description?.en_US) {
     embeddedResponse.setDescription(achievementById.description.en_US);

@@ -9,7 +9,9 @@ import {
   getPet,
   getPlayableRace,
   getQuest,
-  getSpecialization
+  getSpecialization,
+  getTitle,
+  getToy
 } from './functions/selectRandomWoWFact';
 
 export class SelectRandomWoWFact extends SlashCommand {
@@ -54,8 +56,10 @@ export class SelectRandomWoWFact extends SlashCommand {
       case FactChoice.TALENT:
         break;
       case FactChoice.TOY:
+        await getToy(embeddedResponse);
         break;
       case FactChoice.TITLE:
+        await getTitle(embeddedResponse);
         break;
       case FactChoice.CLASS:
         break;
