@@ -26,8 +26,40 @@ import {
   type ReputationTierByIdApiResponse
 } from '../../types/Bnet/Reputation';
 import { type ItemSetApiResponse, type ItemSetByIdApiResponse } from '../../types/Bnet/ItemSet';
+import { type TalentByIdApiResponse, type TalentIndexApiResponse } from '../../types/Bnet/Talents';
+import { type SpellByIdApiResponse } from '../../types/Bnet/Spell';
 
 const baseUrl = AppConfig.instance.bnetApi;
+
+export async function getTalent(embeddedResponse: EmbedBuilder): Promise<void> {
+  const talentIndex: TalentIndexApiResponse = await BnetHttpClient.instance.get(`${baseUrl}/data/wow/talent/index`);
+  const randomTalent = getRandomArrayElement(talentIndex.talents);
+  console.info(`Calling ${randomTalent.key.href}`);
+  const talentById: TalentByIdApiResponse = await BnetHttpClient.instance.get(randomTalent.key.href);
+  if (talentById.spell) {
+    embeddedResponse.setTitle(
+      `TALENT\n${getName(talentById.spell.name)} - ${getName(talentById.playable_class?.name)}`
+    );
+    console.info(`Calling for spell ${talentById.spell.key.href}`);
+    const spellById: SpellByIdApiResponse = await BnetHttpClient.instance.get(talentById.spell.key.href);
+    const spellDisplay: BnetMediaDisplay | undefined = await BnetHttpClient.instance.get(spellById.media.key.href);
+    embeddedResponse.setDescription(spellById.description.en_US);
+    if (spellDisplay?.assets && spellDisplay.assets.length > 0) {
+      embeddedResponse.setImage(spellDisplay.assets[0].value);
+    }
+  } else {
+    embeddedResponse.setTitle('TALENT');
+  }
+  if (talentById.rank_descriptions && talentById.rank_descriptions.length > 0) {
+    if (talentById.rank_descriptions.length > 1) {
+      const descriptions = talentById.rank_descriptions.map((description) => {
+        const desc = description.description.en_US;
+        return `(${description.rank}) ${desc}`;
+      });
+      embeddedResponse.addFields({ name: 'RANKS', value: descriptions.join('\n') });
+    }
+  }
+}
 
 export async function getItemSet(embeddedResponse: EmbedBuilder): Promise<void> {
   const itemIndex: ItemSetApiResponse = await BnetHttpClient.instance.get(`${baseUrl}/data/wow/item-set/index`);

@@ -13,6 +13,7 @@ import {
   getQuest,
   getReputation,
   getSpecialization,
+  getTalent,
   getTitle,
   getToy
 } from './functions/selectRandomWoWFact';
@@ -53,11 +54,14 @@ export class SelectRandomWoWFact extends SlashCommand {
         await getQuest(embeddedResponse);
         break;
       case FactChoice.SPELL:
-        break;
+        // eslint-disable-next-line quotes
+        await interaction.editReply("I CAN'T CAST THIS YET. Go away.");
+        throw new Error('Not implemented.');
       case FactChoice.REP:
         await getReputation(embeddedResponse);
         break;
       case FactChoice.TALENT:
+        await getTalent(embeddedResponse);
         break;
       case FactChoice.TOY:
         await getToy(embeddedResponse);
