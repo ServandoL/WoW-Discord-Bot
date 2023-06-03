@@ -1,14 +1,48 @@
-import { type BnetApiKeyId, type BnetApiTypeName, type BnetApiLocale, type BnetApiRequirements } from './Common';
+import {
+  type BnetApiKeyId,
+  type BnetApiTypeName,
+  type BnetApiLocale,
+  type BnetApiRequirements,
+  type BnetApiSelf
+} from './Common';
 
-export interface RootItemUpgrades {
-  item: BnetItem[];
-  level: number;
-}
+export const ItemClass = {
+  ARMOR: 'Armor',
+  WEAPON: 'Weapon'
+};
+
+export const ItemSubclass = {
+  SHIELD: 'Shield',
+  MISC: 'Miscellaneous',
+  POLEARM: 'Polearm',
+  DAGGER: 'Dagger',
+  LEATHER: 'Leather',
+  STAFF: 'Staff',
+  SWORD: 'Sword'
+};
 
 export interface BnetItem {
+  _links: BnetApiSelf;
+  id: number;
+  name: BnetApiLocale;
+  quality: BnetApiTypeName;
+  level: number;
+  required_level: number;
+  media: BnetApiKeyId;
+  item_class: BnetApiKeyId;
+  item_subclass: BnetApiKeyId;
+  inventory_type: BnetApiTypeName;
+  purchase_price: number;
+  sell_price: number;
+  max_count: number;
+  is_equippable: boolean;
+  is_stackable: boolean;
+  preview_item: PreviewItem;
+  purchase_quantity: number;
+}
+
+export interface PreviewItem {
   item: BnetApiKeyId;
-  context: number;
-  bonus_list: number[];
   quality: BnetApiTypeName;
   name: BnetApiLocale;
   media: BnetApiKeyId;
@@ -16,11 +50,45 @@ export interface BnetItem {
   item_subclass: BnetApiKeyId;
   inventory_type: BnetApiTypeName;
   binding: BnetApiTypeName;
-  weapon: Weapon;
+  weapon?: Weapon;
+  armor?: ItemStatsDisplay;
+  shield_block?: ItemStatsDisplay;
+  set?: ItemSet;
+  unique_equipped?: BnetApiLocale;
+  limit_category?: BnetApiLocale;
+  spell?: Spell[];
+  socket_bonus?: BnetApiLocale;
+  name_description: ItemStatsDisplay;
+  sockets?: Socket[];
   stats: ItemStats[];
   upgrades: ItemUpgrades;
   requirements: BnetApiRequirements;
   level: ItemLevel;
+}
+
+export interface Socket {
+  socket_type: BnetApiTypeName;
+}
+
+export interface Spell {
+  spell: BnetApiKeyId;
+  description: BnetApiLocale;
+}
+
+export interface ItemSet {
+  display_string: BnetApiLocale;
+  effects: ItemSetEffect[];
+  item_set: BnetApiKeyId;
+  items: Item[];
+}
+
+export interface Item {
+  item: BnetApiKeyId;
+}
+
+export interface ItemSetEffect {
+  display_string: BnetApiLocale;
+  required_count: number;
 }
 
 export interface ItemLevel {
@@ -30,6 +98,7 @@ export interface ItemLevel {
 
 export interface Weapon {
   damage: WeaponDamage;
+  damage_class?: BnetApiTypeName;
   attack_speed: WeaponAttackSpeedAndDps;
   dps: WeaponAttackSpeedAndDps;
 }

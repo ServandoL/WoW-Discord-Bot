@@ -2,7 +2,7 @@ import { SlashCommandBuilder, type ChatInputCommandInteraction, EmbedBuilder } f
 import { SlashCommand } from './class/SlashCommand';
 import { RANDOM_CHOICES } from '../common/defaults';
 import { FactChoice } from '../types/interfaces';
-import { getAchievement, getMount } from './functions/selectRandomWoWFact';
+import { getAchievement, getHeirloom, getMount } from './functions/selectRandomWoWFact';
 
 export class SelectRandomWoWFact extends SlashCommand {
   data: SlashCommandBuilder;
@@ -18,6 +18,7 @@ export class SelectRandomWoWFact extends SlashCommand {
       case FactChoice.CREATURE:
         break;
       case FactChoice.HEIRLOOM:
+        await getHeirloom(embeddedResponse);
         break;
       case FactChoice.ITEM:
         break;
