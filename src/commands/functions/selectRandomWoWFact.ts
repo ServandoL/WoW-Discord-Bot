@@ -598,11 +598,13 @@ export async function getAchievement(embeddedResponse: EmbedBuilder): Promise<vo
       inline: true
     });
   }
-  if (achievementById.next_achievement && typeof achievementById.next_achievement.name !== 'string') {
+  if (achievementById.next_achievement) {
+    const name = getName(achievementById.next_achievement.name);
     fields.push({
       name: 'NEXT ACHIEVEMENT',
-      value: achievementById.next_achievement.name?.en_US ?? 'NO DATA',
+      value: name,
       inline: true
     });
   }
+  embeddedResponse.addFields(...fields);
 }

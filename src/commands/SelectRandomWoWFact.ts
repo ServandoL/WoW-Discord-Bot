@@ -83,7 +83,7 @@ export class SelectRandomWoWFact extends SlashCommand {
     super();
     this.data = new SlashCommandBuilder()
       .setName('lore')
-      .setDescription('Response with a random world of warcraft fact.');
+      .setDescription('Response with a random world of warcraft lore.');
     this.data.addNumberOption((option) =>
       option
         .setName('category')
