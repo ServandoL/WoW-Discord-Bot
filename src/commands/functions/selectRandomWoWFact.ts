@@ -7,8 +7,159 @@ import { AppConfig } from '../../AppConfig';
 import { type MountByIdApiResponse, type MountDisplay, type MountIndexApiResponse } from '../../types/Bnet/Mounts';
 import { type HeirloomByIdApiResponse, type HeirloomIndexApiResponse } from '../../types/Bnet/Heirlooms';
 import { getRandomArrayElement } from './utils';
+import { type PetByIdApiResponse, type PetIndexApiResponse } from '../../types/Bnet/Pet';
+import { type RaceByIdApiResponse, type RaceIndexApiResponse } from '../../types/Bnet/Race';
+import { type SpecByIdApiResponse, type SpecIndexApiResponse } from '../../types/Bnet/Specialization';
 
 const baseUrl = AppConfig.instance.bnetApi;
+
+export async function getSpecialization(embeddedResponse: EmbedBuilder): Promise<void> {
+  const specIndex: SpecIndexApiResponse = await BnetHttpClient.instance.get(
+    `${baseUrl}/data/wow/playable-specialization/index`
+  );
+  const randomSpec = getRandomArrayElement(specIndex.character_specializations);
+  console.log(`Calling ${randomSpec.key.href}`);
+  const specById: SpecByIdApiResponse = await BnetHttpClient.instance.get(randomSpec.key.href);
+  const specDisplay: BnetMediaDisplay | undefined = await BnetHttpClient.instance.get(specById.media.key.href);
+  const fields: EmbedBuilderFields[] = [];
+  if (specById.name.en_US) {
+    const className =
+      typeof specById.playable_class.name !== 'string'
+        ? specById.playable_class.name?.en_US ?? 'NO DATA'
+        : specById.playable_class.name;
+    embeddedResponse.setTitle(`${specById.name.en_US} ${className} - ${specById.role.type}`);
+  }
+  if (specById.gender_description.male) {
+    embeddedResponse.setDescription(specById.gender_description.male.en_US);
+  } else {
+    embeddedResponse.setDescription(specById.gender_description.female.en_US);
+  }
+  if (specDisplay?.assets && specDisplay.assets?.length > 0) {
+    embeddedResponse.setImage(specDisplay.assets[0].value);
+  }
+  if (specById.pvp_talents && specById.pvp_talents?.length > 0) {
+    embeddedResponse.addFields({
+      name: '\u200B',
+      value: 'PVP TALENTS'
+    });
+    specById.pvp_talents.forEach((talent) => {
+      const field: EmbedBuilderFields = {
+        name: typeof talent.talent.name !== 'string' ? `${talent.talent.name?.en_US ?? 'NO DATA'}` : talent.talent.name,
+        value: `${talent.spell_tooltip.description.en_US}`
+      };
+      fields.push(field);
+    });
+    embeddedResponse.addFields(...fields);
+  }
+}
+
+export async function getPlayableRace(embeddedResponse: EmbedBuilder): Promise<void> {
+  const raceIndex: RaceIndexApiResponse = await BnetHttpClient.instance.get(`${baseUrl}/data/wow/playable-race/index`);
+  const randomRace = getRandomArrayElement(raceIndex.races);
+  console.log(`Calling ${randomRace.key.href}`);
+  const raceById: RaceByIdApiResponse = await BnetHttpClient.instance.get(randomRace.key.href);
+  if (raceById.name.en_US) {
+    embeddedResponse.setTitle(raceById.name.en_US);
+  }
+  if (raceById.faction.type) {
+    embeddedResponse.setDescription(raceById.faction.type);
+  }
+  const fields: EmbedBuilderFields[] = [];
+  if (raceById.is_allied_race) {
+    embeddedResponse.addFields({
+      name: 'ALLIED RACE',
+      value: '\u200B'
+    });
+  }
+  if (raceById.playable_classes && raceById.playable_classes.length > 0) {
+    embeddedResponse.addFields({
+      name: '\u200B',
+      value: 'CLASSES'
+    });
+    raceById.playable_classes.forEach((playableClass) => {
+      const field: EmbedBuilderFields = {
+        name: typeof playableClass.name !== 'string' ? playableClass.name?.en_US ?? 'NO DATA' : playableClass.name,
+        value: '\u200B'
+      };
+      fields.push(field);
+    });
+  }
+  embeddedResponse.addFields(...fields);
+}
+
+export async function getPet(embeddedResponse: EmbedBuilder): Promise<void> {
+  const petIndex: PetIndexApiResponse = await BnetHttpClient.instance.get(`${baseUrl}/data/wow/pet/index`);
+  const randomPet = getRandomArrayElement(petIndex.pets);
+  console.info(`Calling ${randomPet.key.href}`);
+  const petById: PetByIdApiResponse = await BnetHttpClient.instance.get(randomPet.key.href);
+  const petDisplay: BnetMediaDisplay | undefined = await BnetHttpClient.instance.get(petById.media.key.href);
+  if (petById.name.en_US) {
+    embeddedResponse.setTitle(petById.name.en_US);
+  }
+  if (petById.description.en_US) {
+    embeddedResponse.setDescription(petById.description.en_US);
+  }
+  if (petDisplay?.assets && petDisplay.assets.length > 0) {
+    embeddedResponse.setImage(petDisplay.assets[0].value);
+  }
+  const fields: EmbedBuilderFields[] = [];
+  if (petById.source) {
+    fields.push({
+      name: 'SOURCE',
+      value: petById.source.type,
+      inline: true
+    });
+  }
+  if (petById.battle_pet_type) {
+    fields.push({
+      name: 'TYPE',
+      value: petById.battle_pet_type.type,
+      inline: true
+    });
+  }
+  if (fields.length > 0) {
+    embeddedResponse.addFields(...fields);
+  }
+  embeddedResponse.addFields(
+    {
+      name: 'CAPTURABLE',
+      value: petById.is_capturable ? 'YES' : 'NO',
+      inline: true
+    },
+    {
+      name: 'TRADABLE',
+      value: petById.is_tradable ? 'YES' : 'NO',
+      inline: true
+    },
+    {
+      name: 'BATTLEPET',
+      value: petById.is_battlepet ? 'YES' : 'NO'
+    },
+    {
+      name: 'FACTION',
+      value: petById.is_alliance_only ? 'ALLIANCE' : petById.is_horde_only ? 'HORDE' : 'NEUTRAL',
+      inline: true
+    }
+  );
+  if (petById.abilities && petById.abilities.length > 0) {
+    fields.length = 0;
+    embeddedResponse.addFields({
+      name: '\u200B',
+      value: '\u200B'
+    });
+    petById.abilities.forEach((ability) => {
+      const field: EmbedBuilderFields = {
+        name:
+          typeof ability.ability.name !== 'string'
+            ? ability.ability.name?.en_US ?? 'NO DATA'
+            : ability.ability.name ?? 'NO DATA',
+        value: `Required level: ${ability.required_level}`
+      };
+      fields.push(field);
+    });
+    embeddedResponse.addFields(...fields);
+  }
+}
 
 export async function getHeirloom(embeddedResponse: EmbedBuilder): Promise<void> {
   const heirloomIndex: HeirloomIndexApiResponse = await BnetHttpClient.instance.get(
