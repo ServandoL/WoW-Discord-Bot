@@ -10,8 +10,60 @@ import { getRandomArrayElement } from './utils';
 import { type PetByIdApiResponse, type PetIndexApiResponse } from '../../types/Bnet/Pet';
 import { type RaceByIdApiResponse, type RaceIndexApiResponse } from '../../types/Bnet/Race';
 import { type SpecByIdApiResponse, type SpecIndexApiResponse } from '../../types/Bnet/Specialization';
+import {
+  type SingleQuestAreaApiResponse,
+  type QuestAreasApiResponse,
+  type QuestByIdApiResponse,
+  type QuestIndexApiResponse
+} from '../../types/Bnet/Quests';
 
 const baseUrl = AppConfig.instance.bnetApi;
+
+export async function getQuest(embeddedResponse: EmbedBuilder): Promise<void> {
+  const questIndex: QuestIndexApiResponse = await BnetHttpClient.instance.get(`${baseUrl}/data/wow/quest/index`);
+  const questAreas: QuestAreasApiResponse = await BnetHttpClient.instance.get(questIndex.areas.href);
+  const randomQuestArea = getRandomArrayElement(questAreas.areas);
+  const singleQuestArea: SingleQuestAreaApiResponse = await BnetHttpClient.instance.get(randomQuestArea.key.href);
+  const randomQuest = getRandomArrayElement(singleQuestArea.quests);
+  console.info(`Calling ${randomQuest.key.href}`);
+  const questById: QuestByIdApiResponse = await BnetHttpClient.instance.get(randomQuest.key.href);
+  const fields: EmbedBuilderFields[] = [];
+  const questAreaName =
+    typeof randomQuestArea.name !== 'string' ? randomQuestArea.name?.en_US ?? 'NO DATA' : randomQuestArea.name;
+  if (questById.title.en_US) {
+    embeddedResponse.setTitle(`${questById.title.en_US} - ${questAreaName}`);
+  } else {
+    embeddedResponse.setTitle(questAreaName);
+  }
+  if (questById.description.en_US) {
+    embeddedResponse.setDescription(
+      `Requirements: Level ${questById.requirements.min_character_level} - ${questById.requirements.max_character_level}\n${questById.description.en_US}`
+    );
+  } else {
+    embeddedResponse.setDescription(
+      `Requirements: Level ${questById.requirements.min_character_level} - ${questById.requirements.max_character_level}`
+    );
+  }
+
+  if (questById.rewards.reputations && questById.rewards.reputations.length > 0) {
+    const reputationReward: string[] = [];
+    questById.rewards.reputations.forEach((rep) => {
+      const repName = typeof rep.reward.name === 'string' ? rep.reward.name : rep.reward.name?.en_US ?? 'NO DATA';
+      reputationReward.push(`REP REWARD: ${repName} - ${rep.value}`);
+    });
+    fields.push({
+      name: '\u200B',
+      value: reputationReward.map((reward) => reward).join('\n')
+    });
+  }
+  embeddedResponse.addFields(
+    {
+      name: 'REWARDS',
+      value: `${questById.rewards.money.units.gold}g ${questById.rewards.money.units.silver}s ${questById.rewards.money.units.copper}c\n${questById.rewards.experience} EXP`
+    },
+    ...fields
+  );
+}
 
 export async function getSpecialization(embeddedResponse: EmbedBuilder): Promise<void> {
   const specIndex: SpecIndexApiResponse = await BnetHttpClient.instance.get(

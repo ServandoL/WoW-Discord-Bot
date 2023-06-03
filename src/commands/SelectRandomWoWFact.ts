@@ -8,6 +8,7 @@ import {
   getMount,
   getPet,
   getPlayableRace,
+  getQuest,
   getSpecialization
 } from './functions/selectRandomWoWFact';
 
@@ -44,6 +45,7 @@ export class SelectRandomWoWFact extends SlashCommand {
         await getSpecialization(embeddedResponse);
         break;
       case FactChoice.QUEST:
+        await getQuest(embeddedResponse);
         break;
       case FactChoice.SPELL:
         break;
