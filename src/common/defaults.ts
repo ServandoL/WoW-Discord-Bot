@@ -15,8 +15,8 @@ export const RANDOM_CHOICES: Array<APIApplicationCommandOptionChoice<number>> = 
     value: FactChoice.HEIRLOOM
   },
   {
-    name: 'Items',
-    value: FactChoice.ITEM
+    name: 'Item Set',
+    value: FactChoice.ITEM_SET
   },
   {
     name: 'Mounts',

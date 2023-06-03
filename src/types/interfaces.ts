@@ -14,7 +14,8 @@ export enum FactChoice {
   TALENT,
   TOY,
   TITLE,
-  CLASS
+  CLASS,
+  ITEM_SET
 }
 
 export interface ApplicationConfiguration {

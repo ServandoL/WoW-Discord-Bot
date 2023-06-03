@@ -6,6 +6,7 @@ import {
   getAchievement,
   getClass,
   getHeirloom,
+  getItemSet,
   getMount,
   getPet,
   getPlayableRace,
@@ -28,11 +29,13 @@ export class SelectRandomWoWFact extends SlashCommand {
         await getAchievement(embeddedResponse);
         break;
       case FactChoice.CREATURE:
-        break;
+        await interaction.editReply('Sorry, but CREATURE is not implemented yet. Go away.');
+        throw new Error('Not implemented.');
       case FactChoice.HEIRLOOM:
         await getHeirloom(embeddedResponse);
         break;
-      case FactChoice.ITEM:
+      case FactChoice.ITEM_SET:
+        await getItemSet(embeddedResponse);
         break;
       case FactChoice.MOUNT:
         await getMount(embeddedResponse);

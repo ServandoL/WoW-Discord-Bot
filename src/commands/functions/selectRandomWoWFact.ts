@@ -25,8 +25,36 @@ import {
   type ReputationFactionIndexApiResponse,
   type ReputationTierByIdApiResponse
 } from '../../types/Bnet/Reputation';
+import { type ItemSetApiResponse, type ItemSetByIdApiResponse } from '../../types/Bnet/ItemSet';
 
 const baseUrl = AppConfig.instance.bnetApi;
+
+export async function getItemSet(embeddedResponse: EmbedBuilder): Promise<void> {
+  const itemIndex: ItemSetApiResponse = await BnetHttpClient.instance.get(`${baseUrl}/data/wow/item-set/index`);
+  const randomItem = getRandomArrayElement(itemIndex.item_sets);
+  console.info(`Calling ${randomItem.key.href}`);
+  const itemSetById: ItemSetByIdApiResponse = await BnetHttpClient.instance.get(randomItem.key.href);
+  embeddedResponse.setTitle(`ITEM SET\n${itemSetById.name.en_US}`);
+  if (itemSetById.items && itemSetById.items.length > 0) {
+    const items = itemSetById.items.map((item) => getName(item.name));
+    embeddedResponse.addFields({
+      name: 'PIECES',
+      value: items.join('\n'),
+      inline: true
+    });
+  }
+  if (itemSetById.effects && itemSetById.effects.length > 0) {
+    const effects = itemSetById.effects.map((effect) => {
+      const name = effect.display_string.en_US;
+      const count = effect.required_count.toString();
+      return `${name} (${count})`;
+    });
+    embeddedResponse.addFields({
+      name: 'EFFECTS',
+      value: effects.join('\n')
+    });
+  }
+}
 
 export async function getReputation(embeddedResponse: EmbedBuilder): Promise<void> {
   const repIndex: ReputationFactionIndexApiResponse = await BnetHttpClient.instance.get(
