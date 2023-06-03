@@ -6,7 +6,7 @@ import { type EmbedBuilderFields } from '../../types/interfaces';
 import { AppConfig } from '../../AppConfig';
 import { type MountByIdApiResponse, type MountDisplay, type MountIndexApiResponse } from '../../types/Bnet/Mounts';
 import { type HeirloomByIdApiResponse, type HeirloomIndexApiResponse } from '../../types/Bnet/Heirlooms';
-import { getRandomArrayElement } from './utils';
+import { getName, getRandomArrayElement } from './utils';
 import { type PetByIdApiResponse, type PetIndexApiResponse } from '../../types/Bnet/Pet';
 import { type RaceByIdApiResponse, type RaceIndexApiResponse } from '../../types/Bnet/Race';
 import { type SpecByIdApiResponse, type SpecIndexApiResponse } from '../../types/Bnet/Specialization';
@@ -19,8 +19,51 @@ import {
 import { type TitleByIdApiResponse, type TitleIndexApiResponse } from '../../types/Bnet/Titles';
 import { type ToyByIdApiResponse, type ToyIndexApiResponse } from '../../types/Bnet/Toy';
 import { type ItemByIdApiResponse } from '../../types/Bnet/Item';
+import { type ClassByIdApiResponse, type ClassIndexApiResponse } from '../../types/Bnet/Classes';
 
 const baseUrl = AppConfig.instance.bnetApi;
+
+export async function getClass(embeddedResponse: EmbedBuilder): Promise<void> {
+  const classIndex: ClassIndexApiResponse = await BnetHttpClient.instance.get(
+    `${baseUrl}/data/wow/playable-class/index`
+  );
+  const randomClass = getRandomArrayElement(classIndex.classes);
+  console.info(`Calling ${randomClass.key.href}`);
+  const classById: ClassByIdApiResponse = await BnetHttpClient.instance.get(randomClass.key.href);
+  const classMedia: BnetMediaDisplay | undefined = await BnetHttpClient.instance.get(classById.media.key.href);
+  embeddedResponse.setTitle(`CLASS\n${classById.name.en_US}`);
+  embeddedResponse.addFields({
+    name: 'POWER TYPE',
+    value:
+      typeof classById.power_type.name === 'string'
+        ? classById.power_type.name
+        : classById.power_type.name?.en_US ?? 'NO DATA',
+    inline: true
+  });
+  if (classMedia?.assets && classMedia.assets.length > 0) {
+    embeddedResponse.setImage(classMedia.assets[0].value);
+  }
+  if (classById.specializations && classById.specializations.length > 0) {
+    const specs = classById.specializations.map((spec) => {
+      const name = getName(spec.name);
+      return name;
+    });
+    embeddedResponse.addFields({
+      name: 'SPECS',
+      value: specs.join('\n')
+    });
+  }
+  if (classById.playable_races && classById.playable_races.length > 0) {
+    const races = classById.playable_races.map((race) => {
+      const name = getName(race.name);
+      return name;
+    });
+    embeddedResponse.addFields({
+      name: 'RACES',
+      value: races.join('\n')
+    });
+  }
+}
 
 export async function getToy(embeddedResponse: EmbedBuilder): Promise<void> {
   const toyIndex: ToyIndexApiResponse = await BnetHttpClient.instance.get(`${baseUrl}/data/wow/toy/index`);
@@ -29,7 +72,7 @@ export async function getToy(embeddedResponse: EmbedBuilder): Promise<void> {
   const toyById: ToyByIdApiResponse = await BnetHttpClient.instance.get(randomToy.key.href);
   const toyDisplay: BnetMediaDisplay | undefined = await BnetHttpClient.instance.get(toyById.media.key.href);
   const itemById: ItemByIdApiResponse = await BnetHttpClient.instance.get(toyById.item.key.href);
-  const toyName = typeof toyById.item.name === 'string' ? toyById.item.name : toyById.item.name?.en_US ?? 'NO DATA';
+  const toyName = getName(toyById.item.name);
   embeddedResponse.setTitle(`TOY\n${toyName}`);
   if (toyById.source_description) {
     embeddedResponse.setDescription(toyById.source_description.en_US);
@@ -114,8 +157,8 @@ export async function getQuest(embeddedResponse: EmbedBuilder): Promise<void> {
   if (questById.rewards.reputations && questById.rewards.reputations.length > 0) {
     const reputationReward: string[] = [];
     questById.rewards.reputations.forEach((rep) => {
-      const repName = typeof rep.reward.name === 'string' ? rep.reward.name : rep.reward.name?.en_US ?? 'NO DATA';
-      reputationReward.push(`REP REWARD: ${repName} - ${rep.value}`);
+      const name = getName(rep.reward.name);
+      reputationReward.push(`REP REWARD: ${name} - ${rep.value}`);
     });
     fields.push({
       name: '\u200B',
@@ -141,11 +184,8 @@ export async function getSpecialization(embeddedResponse: EmbedBuilder): Promise
   const specDisplay: BnetMediaDisplay | undefined = await BnetHttpClient.instance.get(specById.media.key.href);
   const fields: EmbedBuilderFields[] = [];
   if (specById.name.en_US) {
-    const className =
-      typeof specById.playable_class.name !== 'string'
-        ? specById.playable_class.name?.en_US ?? 'NO DATA'
-        : specById.playable_class.name;
-    embeddedResponse.setTitle(`SPEC\n${specById.name.en_US} ${className} - ${specById.role.type}`);
+    const name = getName(specById.playable_class.name);
+    embeddedResponse.setTitle(`SPEC\n${specById.name.en_US} ${name} - ${specById.role.type}`);
   }
   if (specById.gender_description.male) {
     embeddedResponse.setDescription(specById.gender_description.male.en_US);
@@ -161,8 +201,9 @@ export async function getSpecialization(embeddedResponse: EmbedBuilder): Promise
       value: 'PVP TALENTS'
     });
     specById.pvp_talents.forEach((talent) => {
+      const name = getName(talent.talent.name);
       const field: EmbedBuilderFields = {
-        name: typeof talent.talent.name !== 'string' ? `${talent.talent.name?.en_US ?? 'NO DATA'}` : talent.talent.name,
+        name,
         value: `${talent.spell_tooltip.description.en_US}`
       };
       fields.push(field);
@@ -195,8 +236,9 @@ export async function getPlayableRace(embeddedResponse: EmbedBuilder): Promise<v
       value: 'CLASSES'
     });
     raceById.playable_classes.forEach((playableClass) => {
+      const name = getName(playableClass.name);
       const field: EmbedBuilderFields = {
-        name: typeof playableClass.name !== 'string' ? playableClass.name?.en_US ?? 'NO DATA' : playableClass.name,
+        name,
         value: '\u200B'
       };
       fields.push(field);
@@ -266,11 +308,9 @@ export async function getPet(embeddedResponse: EmbedBuilder): Promise<void> {
       value: '\u200B'
     });
     petById.abilities.forEach((ability) => {
+      const name = getName(ability.ability.name);
       const field: EmbedBuilderFields = {
-        name:
-          typeof ability.ability.name !== 'string'
-            ? ability.ability.name?.en_US ?? 'NO DATA'
-            : ability.ability.name ?? 'NO DATA',
+        name,
         value: `Required level: ${ability.required_level}`
       };
       fields.push(field);
@@ -355,26 +395,17 @@ export async function getHeirloom(embeddedResponse: EmbedBuilder): Promise<void>
       },
       {
         name: 'ITEM CLASS',
-        value:
-          typeof baseHeirloom.item_class.name !== 'string'
-            ? baseHeirloom.item_class.name?.en_US ?? 'NO DATA'
-            : 'NO DATA',
+        value: getName(baseHeirloom.item_class.name),
         inline: true
       },
       {
         name: 'ITEM SUBCLASS',
-        value:
-          typeof baseHeirloom.item_subclass.name !== 'string'
-            ? baseHeirloom.item_subclass.name?.en_US ?? 'NO DATA'
-            : 'NO DATA',
+        value: getName(baseHeirloom.item_subclass.name),
         inline: true
       },
       {
         name: 'INVENTORY TYPE',
-        value:
-          typeof baseHeirloom.inventory_type.name !== 'string'
-            ? baseHeirloom.inventory_type.name?.en_US ?? 'NO DATA'
-            : 'NO DATA',
+        value: getName(baseHeirloom.inventory_type.name),
         inline: true
       },
       {

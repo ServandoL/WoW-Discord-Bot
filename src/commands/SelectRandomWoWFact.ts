@@ -4,6 +4,7 @@ import { RANDOM_CHOICES } from '../common/defaults';
 import { FactChoice } from '../types/interfaces';
 import {
   getAchievement,
+  getClass,
   getHeirloom,
   getMount,
   getPet,
@@ -62,6 +63,7 @@ export class SelectRandomWoWFact extends SlashCommand {
         await getTitle(embeddedResponse);
         break;
       case FactChoice.CLASS:
+        await getClass(embeddedResponse);
         break;
       default:
         console.warn(`${interaction.commandName}: ${target?.toString() ?? ''} is not a valid entry.`);
