@@ -28,5 +28,3 @@ export class AuthContext {
     return this._token;
   }
 }
-
-// curl -u {client_id}:{client_secret} -d grant_type=client_credentials https://oauth.battle.net/token
