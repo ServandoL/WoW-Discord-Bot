@@ -10,6 +10,7 @@ import {
   getPet,
   getPlayableRace,
   getQuest,
+  getReputation,
   getSpecialization,
   getTitle,
   getToy
@@ -51,6 +52,7 @@ export class SelectRandomWoWFact extends SlashCommand {
       case FactChoice.SPELL:
         break;
       case FactChoice.REP:
+        await getReputation(embeddedResponse);
         break;
       case FactChoice.TALENT:
         break;

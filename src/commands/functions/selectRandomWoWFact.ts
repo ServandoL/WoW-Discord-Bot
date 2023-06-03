@@ -20,8 +20,47 @@ import { type TitleByIdApiResponse, type TitleIndexApiResponse } from '../../typ
 import { type ToyByIdApiResponse, type ToyIndexApiResponse } from '../../types/Bnet/Toy';
 import { type ItemByIdApiResponse } from '../../types/Bnet/Item';
 import { type ClassByIdApiResponse, type ClassIndexApiResponse } from '../../types/Bnet/Classes';
+import {
+  type ReputationFactionByIdApiResponse,
+  type ReputationFactionIndexApiResponse,
+  type ReputationTierByIdApiResponse
+} from '../../types/Bnet/Reputation';
 
 const baseUrl = AppConfig.instance.bnetApi;
+
+export async function getReputation(embeddedResponse: EmbedBuilder): Promise<void> {
+  const repIndex: ReputationFactionIndexApiResponse = await BnetHttpClient.instance.get(
+    `${baseUrl}/data/wow/reputation-faction/index`
+  );
+  const randomRep = getRandomArrayElement(repIndex.factions);
+  console.info(`Calling ${randomRep.key.href}`);
+  const repFactionById: ReputationFactionByIdApiResponse = await BnetHttpClient.instance.get(randomRep.key.href);
+  const repTiersById: ReputationTierByIdApiResponse = await BnetHttpClient.instance.get(
+    repFactionById.reputation_tiers.key.href
+  );
+  if (repFactionById.player_faction) {
+    embeddedResponse.setTitle(`REPUTATION\n${getName(randomRep.name)} - ${repFactionById.player_faction.type}`);
+  } else {
+    embeddedResponse.setTitle(`REPUTATION\n${getName(randomRep.name)}`);
+  }
+  if (repFactionById.description?.en_US) {
+    embeddedResponse.setDescription(repFactionById.description.en_US);
+  }
+  if (repFactionById.factions && repFactionById.factions.length > 0) {
+    const subFactions: string[] = repFactionById.factions.map((faction) => getName(faction.name));
+    embeddedResponse.addFields({
+      name: 'SUB FACTIONS',
+      value: subFactions.join('\n')
+    });
+  }
+  if (repTiersById.tiers && repTiersById.tiers.length > 0) {
+    const tiers = repTiersById.tiers.map((tier) => tier.name.en_US);
+    embeddedResponse.addFields({
+      name: 'REP TIER',
+      value: tiers.join('\n')
+    });
+  }
+}
 
 export async function getClass(embeddedResponse: EmbedBuilder): Promise<void> {
   const classIndex: ClassIndexApiResponse = await BnetHttpClient.instance.get(
