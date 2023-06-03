@@ -19,10 +19,6 @@ export const RANDOM_CHOICES: Array<APIApplicationCommandOptionChoice<number>> = 
     value: FactChoice.ITEM
   },
   {
-    name: 'Media',
-    value: FactChoice.MEDIA
-  },
-  {
     name: 'Mounts',
     value: FactChoice.MOUNT
   },

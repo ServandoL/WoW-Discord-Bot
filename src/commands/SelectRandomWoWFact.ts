@@ -33,8 +33,6 @@ export class SelectRandomWoWFact extends SlashCommand {
         break;
       case FactChoice.ITEM:
         break;
-      case FactChoice.MEDIA:
-        break;
       case FactChoice.MOUNT:
         await getMount(embeddedResponse);
         break;
