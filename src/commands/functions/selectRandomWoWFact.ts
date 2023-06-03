@@ -6,7 +6,7 @@ import { type EmbedBuilderFields } from '../../types/interfaces';
 import { AppConfig } from '../../AppConfig';
 import { type MountByIdApiResponse, type MountDisplay, type MountIndexApiResponse } from '../../types/Bnet/Mounts';
 import { type HeirloomByIdApiResponse, type HeirloomIndexApiResponse } from '../../types/Bnet/Heirlooms';
-import { getName, getRandomArrayElement } from './utils';
+import { getName, getRandomArrayElement, toPascalCase } from './utils';
 import { type PetByIdApiResponse, type PetIndexApiResponse } from '../../types/Bnet/Pet';
 import { type RaceByIdApiResponse, type RaceIndexApiResponse } from '../../types/Bnet/Race';
 import { type SpecByIdApiResponse, type SpecIndexApiResponse } from '../../types/Bnet/Specialization';
@@ -43,7 +43,9 @@ export async function getTalent(embeddedResponse: EmbedBuilder): Promise<void> {
     console.info(`Calling for spell ${talentById.spell.key.href}`);
     const spellById: SpellByIdApiResponse = await BnetHttpClient.instance.get(talentById.spell.key.href);
     const spellDisplay: BnetMediaDisplay | undefined = await BnetHttpClient.instance.get(spellById.media.key.href);
-    embeddedResponse.setDescription(spellById.description.en_US);
+    if (spellById.description?.en_US) {
+      embeddedResponse.setDescription(spellById.description?.en_US);
+    }
     if (spellDisplay?.assets && spellDisplay.assets.length > 0) {
       embeddedResponse.setImage(spellDisplay.assets[0].value);
     }
@@ -236,14 +238,13 @@ export async function getQuest(embeddedResponse: EmbedBuilder): Promise<void> {
   console.info(`Calling ${randomQuest.key.href}`);
   const questById: QuestByIdApiResponse = await BnetHttpClient.instance.get(randomQuest.key.href);
   const fields: EmbedBuilderFields[] = [];
-  const questAreaName =
-    typeof randomQuestArea.name !== 'string' ? randomQuestArea.name?.en_US ?? 'NO DATA' : randomQuestArea.name;
-  if (questById.title.en_US) {
+  const questAreaName = getName(randomQuestArea.name);
+  if (questById.title?.en_US) {
     embeddedResponse.setTitle(`QUEST\n${questById.title.en_US} - ${questAreaName}`);
   } else {
     embeddedResponse.setTitle('QUEST\n' + questAreaName);
   }
-  if (questById.description.en_US) {
+  if (questById.description?.en_US) {
     embeddedResponse.setDescription(
       `Requirements: Level ${questById.requirements.min_character_level} - ${questById.requirements.max_character_level}\n${questById.description.en_US}`
     );
@@ -264,13 +265,15 @@ export async function getQuest(embeddedResponse: EmbedBuilder): Promise<void> {
       value: reputationReward.map((reward) => reward).join('\n')
     });
   }
-  embeddedResponse.addFields(
-    {
-      name: 'REWARDS',
-      value: `${questById.rewards.money.units.gold}g ${questById.rewards.money.units.silver}s ${questById.rewards.money.units.copper}c\n${questById.rewards.experience} EXP`
-    },
-    ...fields
-  );
+  if (questById.rewards?.money?.units) {
+    embeddedResponse.addFields(
+      {
+        name: 'REWARDS',
+        value: `${questById.rewards.money.units.gold}g ${questById.rewards.money.units.silver}s ${questById.rewards.money.units.copper}c\n${questById.rewards.experience} EXP`
+      },
+      ...fields
+    );
+  }
 }
 
 export async function getSpecialization(embeddedResponse: EmbedBuilder): Promise<void> {
@@ -317,33 +320,20 @@ export async function getPlayableRace(embeddedResponse: EmbedBuilder): Promise<v
   console.log(`Calling ${randomRace.key.href}`);
   const raceById: RaceByIdApiResponse = await BnetHttpClient.instance.get(randomRace.key.href);
   if (raceById.name.en_US) {
-    embeddedResponse.setTitle('RACE\n' + raceById.name.en_US);
+    embeddedResponse.setTitle(
+      'RACE\n' + raceById.name.en_US + `${raceById.faction.type ? ' - ' + toPascalCase(raceById.faction.type) : ''}`
+    );
   }
-  if (raceById.faction.type) {
-    embeddedResponse.setDescription(raceById.faction.type);
-  }
-  const fields: EmbedBuilderFields[] = [];
   if (raceById.is_allied_race) {
-    embeddedResponse.addFields({
-      name: 'ALLIED RACE',
-      value: '\u200B'
-    });
+    embeddedResponse.setDescription('Allied Race');
   }
   if (raceById.playable_classes && raceById.playable_classes.length > 0) {
+    const classes = raceById.playable_classes.map((race) => getName(race.name));
     embeddedResponse.addFields({
-      name: '\u200B',
-      value: 'CLASSES'
-    });
-    raceById.playable_classes.forEach((playableClass) => {
-      const name = getName(playableClass.name);
-      const field: EmbedBuilderFields = {
-        name,
-        value: '\u200B'
-      };
-      fields.push(field);
+      name: 'CLASSES',
+      value: classes.join('\n')
     });
   }
-  embeddedResponse.addFields(...fields);
 }
 
 export async function getPet(embeddedResponse: EmbedBuilder): Promise<void> {
@@ -353,7 +343,7 @@ export async function getPet(embeddedResponse: EmbedBuilder): Promise<void> {
   const petById: PetByIdApiResponse = await BnetHttpClient.instance.get(randomPet.key.href);
   const petDisplay: BnetMediaDisplay | undefined = await BnetHttpClient.instance.get(petById.media.key.href);
   if (petById.name.en_US) {
-    embeddedResponse.setTitle('PET\n' + petById.name.en_US);
+    embeddedResponse.setTitle('PET\n' + petById.name.en_US + ` - ${petById.battle_pet_type?.type ?? ''}`);
   }
   if (petById.description.en_US) {
     embeddedResponse.setDescription(petById.description.en_US);
@@ -362,59 +352,29 @@ export async function getPet(embeddedResponse: EmbedBuilder): Promise<void> {
     embeddedResponse.setImage(petDisplay.assets[0].value);
   }
   const fields: EmbedBuilderFields[] = [];
+  let values = '';
   if (petById.source) {
-    fields.push({
-      name: 'SOURCE',
-      value: petById.source.type,
-      inline: true
-    });
+    values += `Source: ${toPascalCase(petById.source.type)}\n`;
   }
-  if (petById.battle_pet_type) {
-    fields.push({
-      name: 'TYPE',
-      value: petById.battle_pet_type.type,
-      inline: true
-    });
-  }
-  if (fields.length > 0) {
-    embeddedResponse.addFields(...fields);
-  }
-  embeddedResponse.addFields(
-    {
-      name: 'CAPTURABLE',
-      value: petById.is_capturable ? 'YES' : 'NO',
-      inline: true
-    },
-    {
-      name: 'TRADABLE',
-      value: petById.is_tradable ? 'YES' : 'NO',
-      inline: true
-    },
-    {
-      name: 'BATTLEPET',
-      value: petById.is_battlepet ? 'YES' : 'NO'
-    },
-    {
-      name: 'FACTION',
-      value: petById.is_alliance_only ? 'ALLIANCE' : petById.is_horde_only ? 'HORDE' : 'NEUTRAL',
-      inline: true
-    }
-  );
+  values += `Captureable: ${petById.is_capturable ? 'Yes' : 'No'}\n`;
+  values += `Tradeable: ${petById.is_capturable ? 'Yes' : 'No'}\n`;
+  values += `Battle pet: ${petById.is_battlepet ? 'Yes' : 'No'}\n`;
+  values += `Faction: ${petById.is_alliance_only ? 'Alliance' : petById.is_horde_only ? 'Horde' : 'Neutral'}\n`;
+  embeddedResponse.addFields({
+    name: 'INFO',
+    value: values
+  });
+
   if (petById.abilities && petById.abilities.length > 0) {
+    const abilities = petById.abilities.map((ability) => {
+      const name = getName(ability.ability.name);
+      return `${name} - Required level ${ability.required_level}`;
+    });
     fields.length = 0;
     embeddedResponse.addFields({
-      name: '\u200B',
-      value: '\u200B'
+      name: 'ABILITIES',
+      value: abilities.join('\n')
     });
-    petById.abilities.forEach((ability) => {
-      const name = getName(ability.ability.name);
-      const field: EmbedBuilderFields = {
-        name,
-        value: `Required level: ${ability.required_level}`
-      };
-      fields.push(field);
-    });
-    embeddedResponse.addFields(...fields);
   }
 }
 
@@ -430,7 +390,9 @@ export async function getHeirloom(embeddedResponse: EmbedBuilder): Promise<void>
   if (typeof heirloomById.item.name === 'string') {
     embeddedResponse.setTitle('HEIRLOOM\n' + heirloomById.item.name);
   } else {
-    embeddedResponse.setTitle(`HEIRLOOM\n${heirloomById.item.name?.en_US ?? ''}`);
+    embeddedResponse.setTitle(
+      `HEIRLOOM\n${getName(baseHeirloom.inventory_type.name)} - ${heirloomById.item.name?.en_US ?? ''}`
+    );
   }
   embeddedResponse.addFields({
     name: 'ITEM LEVEL',
@@ -442,77 +404,32 @@ export async function getHeirloom(embeddedResponse: EmbedBuilder): Promise<void>
   if (heirloomDisplay?.assets && heirloomDisplay.assets.length > 0) {
     embeddedResponse.setImage(heirloomDisplay.assets[0].value);
   }
-  const fields: EmbedBuilderFields[] = [];
+  let value = '';
   if (heirloomById?.source?.type) {
-    fields.push({
-      name: 'SOURCE',
-      value: heirloomById.source.type,
-      inline: true
-    });
+    value += `SOURCE: ${heirloomById.source.type}\n`;
   }
   if (heirloomById.upgrades?.length > 0) {
-    fields.push({
-      name: '# OF UPGRADES',
-      value: heirloomById.upgrades.length.toString(),
-      inline: true
-    });
+    value += `# OF UPGRADES: ${heirloomById.upgrades.length.toString()}\n`;
   }
   if (heirloomById.upgrades[0].item.requirements.level?.display_string) {
-    fields.push({
-      name: 'REQUIREMENTS',
-      value: heirloomById.upgrades[0].item.requirements.level.display_string.en_US,
-      inline: true
-    });
+    value += `REQUIREMENTS: ${heirloomById.upgrades[0].item.requirements.level.display_string.en_US}\n`;
   }
   if (baseHeirloom.set) {
-    fields.push({
-      name: 'SET',
-      value: baseHeirloom.set.display_string.en_US,
-      inline: true
+    value += `ITEM SET: ${baseHeirloom.set.display_string.en_US}\n`;
+  }
+  value += `ITEM CLASS: ${getName(baseHeirloom.item_class.name)}`;
+  if (value.length > 0) {
+    embeddedResponse.addFields({
+      name: 'INFO',
+      value
     });
   }
-  if (fields.length > 0) {
-    embeddedResponse.addFields(...fields);
-  }
-  if (heirloomById.upgrades.length > 0) {
-    fields.length = 0;
-    if (baseHeirloom.stats && baseHeirloom.stats.length > 0) {
-      const stats = baseHeirloom.stats.map((stat) => {
-        const field: EmbedBuilderFields = {
-          name: stat.type.type,
-          value: stat.display.display_string.en_US,
-          inline: true
-        };
-        return field;
-      });
-      fields.push(...stats);
-    }
-    embeddedResponse.addFields(
-      {
-        name: '\u200B',
-        value: '\u200B'
-      },
-      {
-        name: 'ITEM CLASS',
-        value: getName(baseHeirloom.item_class.name),
-        inline: true
-      },
-      {
-        name: 'ITEM SUBCLASS',
-        value: getName(baseHeirloom.item_subclass.name),
-        inline: true
-      },
-      {
-        name: 'INVENTORY TYPE',
-        value: getName(baseHeirloom.inventory_type.name),
-        inline: true
-      },
-      {
-        name: '\u200B',
-        value: '\u200B'
-      },
-      ...fields
-    );
+  if (baseHeirloom.stats && baseHeirloom.stats.length > 0) {
+    const stats = baseHeirloom.stats.map((stat) => stat.display.display_string.en_US);
+    embeddedResponse.addFields({
+      name: 'STATS',
+      value: stats.join('\n')
+    });
   }
 }
 
