@@ -25,7 +25,6 @@ app.use('/health', (_req, res) => {
     tms: new Date().toISOString()
   };
   try {
-    console.info('health check');
     res.status(200).send(health);
   } catch (error) {
     health.message = JSON.stringify(error);
