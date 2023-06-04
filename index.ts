@@ -5,7 +5,7 @@ import { BnetHttpClient } from './src/common/BnetHttpClient';
 import express from 'express';
 
 const app = express();
-app.use('/', (_req, res) => {
+app.get('/index', (_req, res) => {
   const message = {
     message:
       // eslint-disable-next-line quotes
@@ -18,7 +18,7 @@ app.use('/', (_req, res) => {
     res.status(503).send(message);
   }
 });
-app.use('/health', (_req, res) => {
+app.get('/health', (_req, res) => {
   const health = {
     uptime: process.uptime(),
     message: 'OK',
@@ -32,8 +32,9 @@ app.use('/health', (_req, res) => {
   }
 });
 app.listen(AppConfig.instance.port, () => {
-  console.info(`Server is running on port ${AppConfig.instance.port}`);
+  console.info(`The server is listening on port ${AppConfig.instance.port}`);
 });
+
 // Create the battle.net auth client instance
 BnetHttpClient.start();
 
