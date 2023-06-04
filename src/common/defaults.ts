@@ -1,6 +1,11 @@
 import { type APIApplicationCommandOptionChoice } from 'discord.js';
 import { FactChoice } from '../types/interfaces';
 
+export const APP_TYPE = {
+  APP: 'APP',
+  COMMANDS: 'COMMANDS'
+};
+
 export const RANDOM_CHOICES: Array<APIApplicationCommandOptionChoice<number>> = [
   {
     name: 'Achievements',
