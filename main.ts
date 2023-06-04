@@ -8,7 +8,7 @@ import { deployCommands } from './src/deploy.commands';
 
 export default async function startServer(): Promise<void> {
   const app = express();
-  app.get('/index', (_req, res) => {
+  app.get('/', (_req, res) => {
     const message = {
       message:
         // eslint-disable-next-line quotes
