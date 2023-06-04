@@ -17,6 +17,7 @@ const rest = new REST().setToken(AppConfig.instance.token);
       }
     );
     console.log(`Successfully reloaded ${(data as any[]).length} application (/) commands.`);
+    process.exit(0);
   } catch (error) {
     console.error(`An error occurred: ${JSON.stringify(error)}`);
   }
