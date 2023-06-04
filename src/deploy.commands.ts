@@ -20,6 +20,7 @@ const rest = new REST().setToken(AppConfig.instance.token);
     process.exit(0);
   } catch (error) {
     console.error(`An error occurred: ${JSON.stringify(error)}`);
+    process.exit(1);
   }
 })().catch((error) => {
   console.error(`Rest call failed: ${JSON.stringify(error)}`);
