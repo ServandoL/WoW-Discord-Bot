@@ -2,7 +2,26 @@ import { GatewayIntentBits } from 'discord.js';
 import { AppConfig } from './src/AppConfig';
 import { DiscordClient } from './src/common/DiscordClient';
 import { BnetHttpClient } from './src/common/BnetHttpClient';
+import express from 'express';
 
+const app = express();
+app.use('/health', (_req, res) => {
+  const health = {
+    uptime: process.uptime(),
+    message: 'OK',
+    tms: new Date().toISOString()
+  };
+  try {
+    console.info('health check');
+    res.status(200).send(health);
+  } catch (error) {
+    health.message = JSON.stringify(error);
+    res.status(503).send(health);
+  }
+});
+app.listen(AppConfig.instance.port, () => {
+  console.info(`Server is running on port ${AppConfig.instance.port}`);
+});
 // Create the battle.net auth client instance
 BnetHttpClient.start();
 

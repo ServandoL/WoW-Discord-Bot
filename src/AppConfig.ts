@@ -12,7 +12,8 @@ export class AppConfig {
       bnetClientId: process.env.BNET_CLIENT_ID ?? '',
       bnetSecret: process.env.BNET_SECRET ?? '',
       bnetTokenHost: process.env.BNET_TOKEN_HOST ?? '',
-      bnetApi: process.env.BNET_API ?? ''
+      bnetApi: process.env.BNET_API ?? '',
+      port: process.env.PORT ?? '8080'
     };
   }
 
@@ -21,6 +22,10 @@ export class AppConfig {
       AppConfig._instance = new AppConfig();
     }
     return AppConfig._instance;
+  }
+
+  public get port(): number {
+    return +AppConfig.instance._applicationConfigs.port;
   }
 
   public get bnetApi(): string {
