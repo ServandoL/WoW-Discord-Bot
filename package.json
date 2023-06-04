@@ -1,11 +1,12 @@
 {
-  "name": "wow-discord-bot",
+  "name": "krilvurs-lore-bot",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "start": "env-cmd node dist/index.js",
     "build": "npx tsc",
+    "bashBuild": "npm run build && cp -rf node_modules dist/ && cp package.json dist/",
     "debug": "npx tsc && env-cmd node --inspect dist/index.js",
     "dev": "nodemon index.ts",
     "commands": "nodemon src/deploy.commands.ts",
@@ -40,7 +41,6 @@
   "dependencies": {
     "discord.js": "^14.11.0",
     "env-cmd": "^10.1.0",
-    "passport-bnet": "^2.0.0",
     "simple-oauth2": "^5.0.0",
     "undici": "^5.22.1"
   }

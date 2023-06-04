@@ -6,10 +6,10 @@ export const RANDOM_CHOICES: Array<APIApplicationCommandOptionChoice<number>> = 
     name: 'Achievements',
     value: FactChoice.ACHIEVEMENTS
   },
-  {
-    name: 'Creatures',
-    value: FactChoice.CREATURE
-  },
+  // {
+  //   name: 'Creatures',
+  //   value: FactChoice.CREATURE
+  // },
   {
     name: 'Heirlooms',
     value: FactChoice.HEIRLOOM
@@ -42,10 +42,10 @@ export const RANDOM_CHOICES: Array<APIApplicationCommandOptionChoice<number>> = 
     name: 'Quest',
     value: FactChoice.QUEST
   },
-  {
-    name: 'Spells',
-    value: FactChoice.SPELL
-  },
+  // {
+  //   name: 'Spells',
+  //   value: FactChoice.SPELL
+  // },
   {
     name: 'Reputation',
     value: FactChoice.REP
