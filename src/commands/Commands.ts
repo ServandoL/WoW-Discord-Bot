@@ -1,5 +1,6 @@
 import { type SlashCommand } from './class/SlashCommand';
 import { Ping } from './Ping';
+import { PrivacyPolicy } from './PrivacyPolicy';
 import { SelectRandomWoWFact } from './SelectRandomWoWFact';
 import { Server } from './Server';
 import { User } from './User';
@@ -14,6 +15,6 @@ export class Commands {
   }
 
   public initialize(): SlashCommand[] {
-    return [new Ping(), new Server(), new User(), new SelectRandomWoWFact()];
+    return [new Ping(), new Server(), new User(), new SelectRandomWoWFact(), new PrivacyPolicy()];
   }
 }
