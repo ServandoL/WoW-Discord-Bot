@@ -27,6 +27,7 @@ export interface ApplicationConfiguration {
   bnetTokenHost: string;
   bnetApi: string;
   port: string;
+  type: string;
 }
 
 export interface EmbedBuilderFields {

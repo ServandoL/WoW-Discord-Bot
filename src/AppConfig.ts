@@ -13,7 +13,8 @@ export class AppConfig {
       bnetSecret: process.env.BNET_SECRET ?? '',
       bnetTokenHost: process.env.BNET_TOKEN_HOST ?? '',
       bnetApi: process.env.BNET_API ?? '',
-      port: process.env.PORT ?? '8080'
+      port: process.env.PORT ?? '8080',
+      type: process.env.TYPE ?? 'APP'
     };
   }
 
@@ -22,6 +23,10 @@ export class AppConfig {
       AppConfig._instance = new AppConfig();
     }
     return AppConfig._instance;
+  }
+
+  public get type(): string {
+    return AppConfig.instance._applicationConfigs.type;
   }
 
   public get port(): number {

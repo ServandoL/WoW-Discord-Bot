@@ -2,12 +2,12 @@ import { REST, type RESTPostAPIChatInputApplicationCommandsJSONBody, Routes } fr
 import { DiscordClient } from './common/DiscordClient';
 import { AppConfig } from './AppConfig';
 
-const commands: RESTPostAPIChatInputApplicationCommandsJSONBody[] = DiscordClient.instance
-  .getAllCommands()
-  .map((command) => command.data.toJSON());
+export async function deployCommands(): Promise<void> {
+  const commands: RESTPostAPIChatInputApplicationCommandsJSONBody[] = DiscordClient.instance
+    .getAllCommands()
+    .map((command) => command.data.toJSON());
 
-const rest = new REST().setToken(AppConfig.instance.token);
-(async () => {
+  const rest = new REST().setToken(AppConfig.instance.token);
   try {
     console.log(`Started refreshing ${commands.length} application (/) commands.`);
     const data = await rest.put(
@@ -17,12 +17,8 @@ const rest = new REST().setToken(AppConfig.instance.token);
       }
     );
     console.log(`Successfully reloaded ${(data as any[]).length} application (/) commands.`);
-    process.exit(0);
   } catch (error) {
-    console.error(`An error occurred: ${JSON.stringify(error)}`);
-    process.exit(1);
+    const errorMsg = `An error occurred: ${JSON.stringify(error)}`;
+    throw new Error(errorMsg);
   }
-})().catch((error) => {
-  console.error(`Rest call failed: ${JSON.stringify(error)}`);
-  throw new Error(error);
-});
+}
