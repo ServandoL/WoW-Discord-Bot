@@ -14,7 +14,8 @@ export class AppConfig {
       bnetTokenHost: process.env.BNET_TOKEN_HOST ?? '',
       bnetApi: process.env.BNET_API ?? '',
       port: process.env.PORT ?? '8080',
-      type: process.env.TYPE ?? 'APP'
+      type: process.env.TYPE ?? 'APP',
+      logLevel: process.env.LOG_LEVEL ?? 'info'
     };
   }
 
@@ -23,6 +24,10 @@ export class AppConfig {
       AppConfig._instance = new AppConfig();
     }
     return AppConfig._instance;
+  }
+
+  public get logLevel(): string {
+    return AppConfig.instance._applicationConfigs.logLevel;
   }
 
   public get type(): string {

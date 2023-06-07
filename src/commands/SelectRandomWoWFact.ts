@@ -17,6 +17,7 @@ import {
   getTitle,
   getToy
 } from './functions/selectRandomWoWFact';
+import { logger } from '../logger';
 
 export class SelectRandomWoWFact extends SlashCommand {
   data: SlashCommandBuilder;
@@ -73,8 +74,8 @@ export class SelectRandomWoWFact extends SlashCommand {
         await getClass(embeddedResponse);
         break;
       default:
-        console.warn(`${interaction.commandName}: ${target?.toString() ?? ''} is not a valid entry.`);
-        await interaction.reply('Your entry is not valid. Please try again');
+        logger.warn(`${interaction.commandName}: ${target?.toString() ?? ''} is not a valid entry.`);
+        await interaction.editReply('Your entry is not valid. Please try again');
     }
     await interaction.editReply({ embeds: [embeddedResponse] });
   }

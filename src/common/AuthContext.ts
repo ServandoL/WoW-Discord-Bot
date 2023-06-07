@@ -1,3 +1,4 @@
+import { logger } from '../logger';
 import { type OAuthOptions } from '../types/AuthToken';
 import oauth2 from 'simple-oauth2';
 
@@ -19,7 +20,7 @@ export class AuthContext {
       return this._token.token;
     } catch (error) {
       const message = `AuthContext: Access Token error: ${JSON.stringify(error)}`;
-      console.error(message);
+      logger.error(message);
       throw new Error(message);
     }
   }

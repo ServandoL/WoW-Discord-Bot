@@ -2,6 +2,7 @@ import { request } from 'undici';
 import { AppConfig } from '../AppConfig';
 import { type OAuthOptions } from '../types/AuthToken';
 import { AuthContext } from './AuthContext';
+import { logger } from '../logger';
 
 export class BnetHttpClient extends AuthContext {
   private static _instance: BnetHttpClient;
@@ -20,6 +21,7 @@ export class BnetHttpClient extends AuthContext {
   }
 
   public async get(url: string): Promise<any> {
+    logger.debug(`Calling ${url}`);
     const token = await this.getToken();
     const { body } = await request(url, {
       headers: {

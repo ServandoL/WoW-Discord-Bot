@@ -28,6 +28,7 @@ export interface ApplicationConfiguration {
   bnetApi: string;
   port: string;
   type: string;
+  logLevel: string;
 }
 
 export interface EmbedBuilderFields {

@@ -1,6 +1,7 @@
 import express from 'express';
 import startDiscordApp from './main';
 import { AppConfig } from './src/AppConfig';
+import { logger } from './src/logger';
 (async () => {
   const app = express();
   app.get('/', (_req, res) => {
@@ -10,6 +11,7 @@ import { AppConfig } from './src/AppConfig';
         "Thank you for using my bot. I don't collect any of your information but I do use Blizzard's services for my data. As per Blizzard, I have to include their Privacy Policy. You can view it here: https://www.blizzard.com/en-us/legal/a4380ee5-5c8d-4e3b-83b7-ea26d01a9918/blizzard-entertainment-online-privacy-policy"
     };
     try {
+      logger.info(`Request headers: ${JSON.stringify(_req.headers)}`);
       res.status(200).send(message);
     } catch (error) {
       message.message = JSON.stringify(error);
@@ -30,11 +32,11 @@ import { AppConfig } from './src/AppConfig';
     }
   });
   app.listen(AppConfig.instance.port, () => {
-    console.info(`The server is listening on port ${AppConfig.instance.port}`);
+    logger.info(`The server is listening on port ${AppConfig.instance.port}`);
   });
   await startDiscordApp();
 })().catch((error) => {
-  console.log(
+  logger.error(
     `An error occurred during app startup. ${JSON.stringify({ message: error.message, stacktrace: error.stack })}`
   );
 });
