@@ -28,19 +28,20 @@ import {
 import { type ItemSetApiResponse, type ItemSetByIdApiResponse } from '../../types/Bnet/ItemSet';
 import { type TalentByIdApiResponse, type TalentIndexApiResponse } from '../../types/Bnet/Talents';
 import { type SpellByIdApiResponse } from '../../types/Bnet/Spell';
+import { logger } from '../../logger';
 
 const baseUrl = AppConfig.instance.bnetApi;
 
 export async function getTalent(embeddedResponse: EmbedBuilder): Promise<void> {
   const talentIndex: TalentIndexApiResponse = await BnetHttpClient.instance.get(`${baseUrl}/data/wow/talent/index`);
   const randomTalent = getRandomArrayElement(talentIndex.talents);
-  console.info(`Calling ${randomTalent.key.href}`);
+  logger.info(`Calling ${randomTalent.key.href}`);
   const talentById: TalentByIdApiResponse = await BnetHttpClient.instance.get(randomTalent.key.href);
   if (talentById.spell) {
     embeddedResponse.setTitle(
       `TALENT\n${getName(talentById.spell.name)} - ${getName(talentById.playable_class?.name)}`
     );
-    console.info(`Calling for spell ${talentById.spell.key.href}`);
+    logger.info(`Calling for spell ${talentById.spell.key.href}`);
     const spellById: SpellByIdApiResponse = await BnetHttpClient.instance.get(talentById.spell.key.href);
     const spellDisplay: BnetMediaDisplay | undefined = await BnetHttpClient.instance.get(spellById.media.key.href);
     if (spellById.description?.en_US) {
@@ -66,7 +67,7 @@ export async function getTalent(embeddedResponse: EmbedBuilder): Promise<void> {
 export async function getItemSet(embeddedResponse: EmbedBuilder): Promise<void> {
   const itemIndex: ItemSetApiResponse = await BnetHttpClient.instance.get(`${baseUrl}/data/wow/item-set/index`);
   const randomItem = getRandomArrayElement(itemIndex.item_sets);
-  console.info(`Calling ${randomItem.key.href}`);
+  logger.info(`Calling ${randomItem.key.href}`);
   const itemSetById: ItemSetByIdApiResponse = await BnetHttpClient.instance.get(randomItem.key.href);
   embeddedResponse.setTitle(`ITEM SET\n${itemSetById.name.en_US}`);
   if (itemSetById.items && itemSetById.items.length > 0) {
@@ -95,7 +96,7 @@ export async function getReputation(embeddedResponse: EmbedBuilder): Promise<voi
     `${baseUrl}/data/wow/reputation-faction/index`
   );
   const randomRep = getRandomArrayElement(repIndex.factions);
-  console.info(`Calling ${randomRep.key.href}`);
+  logger.info(`Calling ${randomRep.key.href}`);
   const repFactionById: ReputationFactionByIdApiResponse = await BnetHttpClient.instance.get(randomRep.key.href);
   const repTiersById: ReputationTierByIdApiResponse = await BnetHttpClient.instance.get(
     repFactionById.reputation_tiers.key.href
@@ -129,7 +130,7 @@ export async function getClass(embeddedResponse: EmbedBuilder): Promise<void> {
     `${baseUrl}/data/wow/playable-class/index`
   );
   const randomClass = getRandomArrayElement(classIndex.classes);
-  console.info(`Calling ${randomClass.key.href}`);
+  logger.info(`Calling ${randomClass.key.href}`);
   const classById: ClassByIdApiResponse = await BnetHttpClient.instance.get(randomClass.key.href);
   const classMedia: BnetMediaDisplay | undefined = await BnetHttpClient.instance.get(classById.media.key.href);
   embeddedResponse.setTitle(`CLASS\n${classById.name.en_US}`);
@@ -169,7 +170,7 @@ export async function getClass(embeddedResponse: EmbedBuilder): Promise<void> {
 export async function getToy(embeddedResponse: EmbedBuilder): Promise<void> {
   const toyIndex: ToyIndexApiResponse = await BnetHttpClient.instance.get(`${baseUrl}/data/wow/toy/index`);
   const randomToy = getRandomArrayElement(toyIndex.toys);
-  console.info(`Calling ${randomToy.key.href}`);
+  logger.info(`Calling ${randomToy.key.href}`);
   const toyById: ToyByIdApiResponse = await BnetHttpClient.instance.get(randomToy.key.href);
   const toyDisplay: BnetMediaDisplay | undefined = await BnetHttpClient.instance.get(toyById.media.key.href);
   const itemById: ItemByIdApiResponse = await BnetHttpClient.instance.get(toyById.item.key.href);
@@ -210,7 +211,7 @@ export async function getToy(embeddedResponse: EmbedBuilder): Promise<void> {
 export async function getTitle(embeddedResponse: EmbedBuilder): Promise<void> {
   const titleIndex: TitleIndexApiResponse = await BnetHttpClient.instance.get(`${baseUrl}/data/wow/title/index`);
   const randomTitle = getRandomArrayElement(titleIndex.titles);
-  console.info(`Calling ${randomTitle.key.href}`);
+  logger.info(`Calling ${randomTitle.key.href}`);
   const titleById: TitleByIdApiResponse = await BnetHttpClient.instance.get(randomTitle.key.href);
   embeddedResponse.setTitle('TITLE\n' + titleById.name.en_US);
   embeddedResponse.setDescription(
@@ -235,7 +236,7 @@ export async function getQuest(embeddedResponse: EmbedBuilder): Promise<void> {
   const randomQuestArea = getRandomArrayElement(questAreas.areas);
   const singleQuestArea: SingleQuestAreaApiResponse = await BnetHttpClient.instance.get(randomQuestArea.key.href);
   const randomQuest = getRandomArrayElement(singleQuestArea.quests);
-  console.info(`Calling ${randomQuest.key.href}`);
+  logger.info(`Calling ${randomQuest.key.href}`);
   const questById: QuestByIdApiResponse = await BnetHttpClient.instance.get(randomQuest.key.href);
   const fields: EmbedBuilderFields[] = [];
   const questAreaName = getName(randomQuestArea.name);
@@ -281,7 +282,7 @@ export async function getSpecialization(embeddedResponse: EmbedBuilder): Promise
     `${baseUrl}/data/wow/playable-specialization/index`
   );
   const randomSpec = getRandomArrayElement(specIndex.character_specializations);
-  console.log(`Calling ${randomSpec.key.href}`);
+  logger.log(`Calling ${randomSpec.key.href}`);
   const specById: SpecByIdApiResponse = await BnetHttpClient.instance.get(randomSpec.key.href);
   const specDisplay: BnetMediaDisplay | undefined = await BnetHttpClient.instance.get(specById.media.key.href);
   const fields: EmbedBuilderFields[] = [];
@@ -317,7 +318,7 @@ export async function getSpecialization(embeddedResponse: EmbedBuilder): Promise
 export async function getPlayableRace(embeddedResponse: EmbedBuilder): Promise<void> {
   const raceIndex: RaceIndexApiResponse = await BnetHttpClient.instance.get(`${baseUrl}/data/wow/playable-race/index`);
   const randomRace = getRandomArrayElement(raceIndex.races);
-  console.log(`Calling ${randomRace.key.href}`);
+  logger.log(`Calling ${randomRace.key.href}`);
   const raceById: RaceByIdApiResponse = await BnetHttpClient.instance.get(randomRace.key.href);
   if (raceById.name.en_US) {
     embeddedResponse.setTitle(
@@ -339,7 +340,7 @@ export async function getPlayableRace(embeddedResponse: EmbedBuilder): Promise<v
 export async function getPet(embeddedResponse: EmbedBuilder): Promise<void> {
   const petIndex: PetIndexApiResponse = await BnetHttpClient.instance.get(`${baseUrl}/data/wow/pet/index`);
   const randomPet = getRandomArrayElement(petIndex.pets);
-  console.info(`Calling ${randomPet.key.href}`);
+  logger.info(`Calling ${randomPet.key.href}`);
   const petById: PetByIdApiResponse = await BnetHttpClient.instance.get(randomPet.key.href);
   const petDisplay: BnetMediaDisplay | undefined = await BnetHttpClient.instance.get(petById.media.key.href);
   if (petById.name.en_US) {
@@ -383,7 +384,7 @@ export async function getHeirloom(embeddedResponse: EmbedBuilder): Promise<void>
     `${baseUrl}/data/wow/heirloom/index`
   );
   const randomHeirloom = getRandomArrayElement(heirloomIndex.heirlooms);
-  console.info(`Calling ${randomHeirloom.key.href}`);
+  logger.info(`Calling ${randomHeirloom.key.href}`);
   const heirloomById: HeirloomByIdApiResponse = await BnetHttpClient.instance.get(randomHeirloom.key.href);
   const heirloomDisplay: BnetMediaDisplay | undefined = await BnetHttpClient.instance.get(heirloomById.media.key.href);
   const baseHeirloom = heirloomById.upgrades[0].item;
@@ -436,7 +437,7 @@ export async function getHeirloom(embeddedResponse: EmbedBuilder): Promise<void>
 export async function getMount(embeddedResponse: EmbedBuilder): Promise<void> {
   const mountIndex: MountIndexApiResponse = await BnetHttpClient.instance.get(`${baseUrl}/data/wow/mount/index`);
   const randomMount = getRandomArrayElement(mountIndex.mounts);
-  console.info(`Calling ${randomMount.key.href}`);
+  logger.info(`Calling ${randomMount.key.href}`);
   const mountById: MountByIdApiResponse = await BnetHttpClient.instance.get(randomMount.key.href);
   const mountDisplay: MountDisplay | undefined = mountById.creature_displays.length
     ? await BnetHttpClient.instance.get(mountById.creature_displays[0].key.href)
@@ -482,7 +483,7 @@ export async function getAchievement(embeddedResponse: EmbedBuilder): Promise<vo
     `${baseUrl}/data/wow/achievement/index`
   );
   const randomAchievement = getRandomArrayElement(achievementsIndex.achievements);
-  console.info(`Calling ${randomAchievement.key.href}`);
+  logger.info(`Calling ${randomAchievement.key.href}`);
   const achievementById: AchievementByIdApiResponse = await BnetHttpClient.instance.get(randomAchievement.key.href);
   const achievementDisplay: BnetMediaDisplay | undefined = achievementById.media.key.href
     ? await BnetHttpClient.instance.get(achievementById.media.key.href)
