@@ -1,6 +1,7 @@
 import { type Interaction, type SlashCommandBuilder } from 'discord.js';
 
-export abstract class SlashCommand {
-  abstract data: SlashCommandBuilder;
-  abstract execute(interaction: Interaction): Promise<void>;
+export interface SlashCommand {
+  data: SlashCommandBuilder;
+  execute: (interaction: Interaction) => Promise<void>;
+  showModal?: (interaction: Interaction) => Promise<void>;
 }

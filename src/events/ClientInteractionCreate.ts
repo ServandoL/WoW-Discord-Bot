@@ -13,8 +13,13 @@ export class ClientInteractionCreate extends DiscordEvent {
       return;
     }
     try {
-      await command.execute(interaction);
-      logger.info(`${this.name}: ${interaction.commandName} executed successfully.`);
+      if (interaction.commandName === 'subscribe' && !!command.showModal) {
+        await command.showModal(interaction);
+        logger.info(`${this.name}: ${interaction.commandName} modal showed.`);
+      } else {
+        await command.execute(interaction);
+        logger.info(`${this.name}: ${interaction.commandName} executed successfully.`);
+      }
     } catch (error: any) {
       const errorMsg = `${this.name}: ${interaction.commandName} - An error occurred: ${JSON.stringify({
         error: error.message

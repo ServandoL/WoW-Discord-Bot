@@ -1,7 +1,7 @@
 import { type ChatInputCommandInteraction, type Interaction, SlashCommandBuilder } from 'discord.js';
-import { SlashCommand } from './class/SlashCommand';
+import { type SlashCommand } from './class/SlashCommand';
 
-export class Server extends SlashCommand {
+export class Server implements SlashCommand {
   data: SlashCommandBuilder;
   async execute(interaction: Interaction): Promise<void> {
     await (interaction as ChatInputCommandInteraction).reply(
@@ -12,7 +12,6 @@ export class Server extends SlashCommand {
   }
 
   constructor() {
-    super();
     this.data = new SlashCommandBuilder().setName('server').setDescription('Provides information about the server.');
   }
 }
