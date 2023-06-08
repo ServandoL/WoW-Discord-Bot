@@ -1,5 +1,5 @@
 import { type ChatInputCommandInteraction, type Interaction, SlashCommandBuilder } from 'discord.js';
-import { type SlashCommand } from './class/SlashCommand';
+import { type SlashCommand } from './interface/SlashCommand';
 
 export class Server implements SlashCommand {
   data: SlashCommandBuilder;

@@ -1,5 +1,5 @@
 import { SlashCommandBuilder, type ChatInputCommandInteraction, type Interaction } from 'discord.js';
-import { type SlashCommand } from './class/SlashCommand';
+import { type SlashCommand } from './interface/SlashCommand';
 
 export class Unsubscribe implements SlashCommand {
   data: SlashCommandBuilder;

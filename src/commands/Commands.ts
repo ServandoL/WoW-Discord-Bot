@@ -1,4 +1,4 @@
-import { type SlashCommand } from './class/SlashCommand';
+import { type SlashCommand } from './interface/SlashCommand';
 import { Ping } from './Ping';
 import { PrivacyPolicy } from './PrivacyPolicy';
 import { SelectRandomWoWFact } from './SelectRandomWoWFact';

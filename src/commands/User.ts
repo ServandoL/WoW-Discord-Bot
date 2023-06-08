@@ -1,5 +1,5 @@
 import { type ChatInputCommandInteraction, type GuildMember, SlashCommandBuilder, type Interaction } from 'discord.js';
-import { type SlashCommand } from './class/SlashCommand';
+import { type SlashCommand } from './interface/SlashCommand';
 
 export class User implements SlashCommand {
   data: SlashCommandBuilder;

@@ -1,5 +1,5 @@
 import { SlashCommandBuilder, type ChatInputCommandInteraction, EmbedBuilder, type Interaction } from 'discord.js';
-import { type SlashCommand } from './class/SlashCommand';
+import { type SlashCommand } from './interface/SlashCommand';
 import { RANDOM_CHOICES } from '../common/defaults';
 import { FactChoice } from '../types/interfaces';
 import {

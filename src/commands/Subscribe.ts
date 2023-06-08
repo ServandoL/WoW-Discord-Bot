@@ -8,7 +8,7 @@ import {
   type ModalActionRowComponentBuilder,
   type Interaction
 } from 'discord.js';
-import { type SlashCommand } from './class/SlashCommand';
+import { type SlashCommand } from './interface/SlashCommand';
 
 export class Subscribe implements SlashCommand {
   data: SlashCommandBuilder;
