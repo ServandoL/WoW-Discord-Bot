@@ -29,6 +29,13 @@ export interface ApplicationConfiguration {
   port: string;
   type: string;
   logLevel: string;
+  mongo: MongoClientConfiguration;
+}
+
+export interface MongoClientConfiguration {
+  mongoUrl: string;
+  lorebotDb: string;
+  webhooksColn: string;
 }
 
 export interface EmbedBuilderFields {

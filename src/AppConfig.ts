@@ -15,7 +15,12 @@ export class AppConfig {
       bnetApi: process.env.BNET_API ?? '',
       port: process.env.PORT ?? '8080',
       type: process.env.TYPE ?? 'APP',
-      logLevel: process.env.LOG_LEVEL ?? 'info'
+      logLevel: process.env.LOG_LEVEL ?? 'info',
+      mongo: {
+        mongoUrl: process.env.MONGO_URL ?? '',
+        lorebotDb: process.env.LOREBOT_DB ?? '',
+        webhooksColn: process.env.WEBHOOKS_COLN ?? ''
+      }
     };
   }
 
@@ -24,6 +29,18 @@ export class AppConfig {
       AppConfig._instance = new AppConfig();
     }
     return AppConfig._instance;
+  }
+
+  public get mongoUrl(): string {
+    return AppConfig.instance._applicationConfigs.mongo.mongoUrl;
+  }
+
+  public get lorebotDb(): string {
+    return AppConfig.instance._applicationConfigs.mongo.lorebotDb;
+  }
+
+  public get webhooksColn(): string {
+    return AppConfig.instance._applicationConfigs.mongo.webhooksColn;
   }
 
   public get logLevel(): string {
