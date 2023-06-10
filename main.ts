@@ -47,6 +47,7 @@ export default async function startDiscordApp(): Promise<void> {
       }
     });
 
+    // TODO: Send a random fact every day
     cron.schedule('* * * * *', () => {
       logger.info('task every minute');
     });
