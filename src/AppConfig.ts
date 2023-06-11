@@ -1,4 +1,4 @@
-import { type ApplicationConfiguration } from './types/interfaces';
+import { type Cipher, type ApplicationConfiguration } from './types/interfaces';
 
 export class AppConfig {
   private static _instance: AppConfig;
@@ -20,6 +20,14 @@ export class AppConfig {
         mongoUrl: process.env.MONGO_URL ?? '',
         lorebotDb: process.env.LOREBOT_DB ?? '',
         webhooksColn: process.env.WEBHOOKS_COLN ?? ''
+      },
+      crypto: {
+        cipher: process.env.CIPHER ?? '',
+        password: process.env.PASSWORD ?? '',
+        salt: process.env.SALT ?? '',
+        keyLen: process.env.KEYLEN ? +process.env.KEYLEN : 0,
+        encoding: process.env.ENCODING ?? '',
+        bytes: process.env.BYTE_SIZE ? +process.env.BYTE_SIZE : 0
       }
     };
   }
@@ -29,6 +37,17 @@ export class AppConfig {
       AppConfig._instance = new AppConfig();
     }
     return AppConfig._instance;
+  }
+
+  public get crypto(): Cipher {
+    return {
+      cipher: AppConfig.instance._applicationConfigs.crypto.cipher,
+      password: AppConfig.instance._applicationConfigs.crypto.password,
+      salt: AppConfig.instance._applicationConfigs.crypto.salt,
+      keyLen: AppConfig.instance._applicationConfigs.crypto.keyLen,
+      encoding: AppConfig.instance._applicationConfigs.crypto.encoding,
+      bytes: AppConfig.instance._applicationConfigs.crypto.bytes
+    };
   }
 
   public get mongoUrl(): string {

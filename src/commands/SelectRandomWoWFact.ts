@@ -30,11 +30,11 @@ export class SelectRandomWoWFact implements SlashCommand {
       case FactChoice.ACHIEVEMENTS:
         await getAchievement(embeddedResponse);
         break;
-      case FactChoice.CREATURE:
-        await (interaction as ChatInputCommandInteraction).editReply(
-          'Sorry, but CREATURE is not implemented yet. Go away.'
-        );
-        throw new Error('Not implemented.');
+      // case FactChoice.CREATURE:
+      //   await (interaction as ChatInputCommandInteraction).editReply(
+      //     'Sorry, but CREATURE is not implemented yet. Go away.'
+      //   );
+      //   throw new Error('Not implemented.');
       case FactChoice.HEIRLOOM:
         await getHeirloom(embeddedResponse);
         break;
@@ -56,10 +56,10 @@ export class SelectRandomWoWFact implements SlashCommand {
       case FactChoice.QUEST:
         await getQuest(embeddedResponse);
         break;
-      case FactChoice.SPELL:
-        // eslint-disable-next-line quotes
-        await (interaction as ChatInputCommandInteraction).editReply("I CAN'T CAST THIS YET. Go away.");
-        throw new Error('Not implemented.');
+      // case FactChoice.SPELL:
+      //   // eslint-disable-next-line quotes
+      //   await (interaction as ChatInputCommandInteraction).editReply("I CAN'T CAST THIS YET. Go away.");
+      //   throw new Error('Not implemented.');
       case FactChoice.REP:
         await getReputation(embeddedResponse);
         break;

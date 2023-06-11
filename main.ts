@@ -50,6 +50,14 @@ export default async function startDiscordApp(): Promise<void> {
     // TODO: Send a random fact every day
     cron.schedule('* * * * *', () => {
       logger.info('task every minute');
+      MongoClientContext.instance
+        .sendRandomLore()
+        .then(() => {
+          logger.info('Done sending lore.');
+        })
+        .catch((error) => {
+          logger.error(JSON.stringify(error));
+        });
     });
 
     // Log in to Discord with client token

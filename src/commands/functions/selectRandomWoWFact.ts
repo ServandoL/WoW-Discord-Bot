@@ -2,7 +2,7 @@ import { type EmbedBuilder } from 'discord.js';
 import { BnetHttpClient } from '../../common/BnetHttpClient';
 import { type AchievementsIndexApiResponse, type AchievementByIdApiResponse } from '../../types/Bnet/Achievements';
 import { type BnetMediaDisplay } from '../../types/Bnet/Common';
-import { type EmbedBuilderFields } from '../../types/interfaces';
+import { FactChoice, type EmbedBuilderFields } from '../../types/interfaces';
 import { AppConfig } from '../../AppConfig';
 import { type MountByIdApiResponse, type MountDisplay, type MountIndexApiResponse } from '../../types/Bnet/Mounts';
 import { type HeirloomByIdApiResponse, type HeirloomIndexApiResponse } from '../../types/Bnet/Heirlooms';
@@ -31,6 +31,54 @@ import { type SpellByIdApiResponse } from '../../types/Bnet/Spell';
 import { logger } from '../../logger';
 
 const baseUrl = AppConfig.instance.bnetApi;
+
+export async function getRandomFact(embeddedResponse: EmbedBuilder): Promise<void> {
+  const enumValues = Object.values(FactChoice);
+  const target = getRandomArrayElement(enumValues.filter((val) => typeof val === 'number'));
+  switch (target) {
+    case FactChoice.ACHIEVEMENTS:
+      await getAchievement(embeddedResponse);
+      break;
+    case FactChoice.HEIRLOOM:
+      await getHeirloom(embeddedResponse);
+      break;
+    case FactChoice.ITEM_SET:
+      await getItemSet(embeddedResponse);
+      break;
+    case FactChoice.MOUNT:
+      await getMount(embeddedResponse);
+      break;
+    case FactChoice.PET:
+      await getPet(embeddedResponse);
+      break;
+    case FactChoice.RACE:
+      await getPlayableRace(embeddedResponse);
+      break;
+    case FactChoice.SPEC:
+      await getSpecialization(embeddedResponse);
+      break;
+    case FactChoice.QUEST:
+      await getQuest(embeddedResponse);
+      break;
+    case FactChoice.REP:
+      await getReputation(embeddedResponse);
+      break;
+    case FactChoice.TALENT:
+      await getTalent(embeddedResponse);
+      break;
+    case FactChoice.TOY:
+      await getToy(embeddedResponse);
+      break;
+    case FactChoice.TITLE:
+      await getTitle(embeddedResponse);
+      break;
+    case FactChoice.CLASS:
+      await getClass(embeddedResponse);
+      break;
+    default:
+      logger.warn(`${target} is not a valid entry.`);
+  }
+}
 
 export async function getTalent(embeddedResponse: EmbedBuilder): Promise<void> {
   const talentIndex: TalentIndexApiResponse = await BnetHttpClient.instance.get(`${baseUrl}/data/wow/talent/index`);

@@ -13,8 +13,7 @@ import { type SlashCommand } from './interface/SlashCommand';
 export class Subscribe implements SlashCommand {
   data: SlashCommandBuilder;
   async execute(interaction: Interaction): Promise<void> {
-    console.log(interaction);
-    await (interaction as ChatInputCommandInteraction).reply('thanks!');
+    await (interaction as ChatInputCommandInteraction).reply('No implemented.');
   }
 
   async showModal(interaction: Interaction): Promise<void> {

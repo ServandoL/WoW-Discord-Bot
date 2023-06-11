@@ -2,6 +2,7 @@ import { Events, type Interaction } from 'discord.js';
 import { DiscordEvent } from './class/DiscordEvent';
 import { logger } from '../logger';
 import { type DiscordClient } from '../common/DiscordClient';
+import { MongoClientContext } from '../common/MongoClientContext';
 
 export class ClientInteractionCreate extends DiscordEvent {
   protected _name: string;
@@ -42,7 +43,9 @@ export class ClientInteractionCreate extends DiscordEvent {
       if (interaction.customId === 'subscribe') {
         try {
           // TODO: Logic to store encrypted webhook in mongodb
-          await interaction.reply({ content: 'thanks!' });
+          const webhook = interaction.fields.getTextInputValue('webhookInput');
+          await MongoClientContext.instance.addWebhook(webhook);
+          await interaction.reply({ content: 'Thanks for subscribing!' });
         } catch (error: any) {
           const errorMsg = `${this.name}: ${interaction.customId} - An error occurred: ${JSON.stringify({
             error: error.message
