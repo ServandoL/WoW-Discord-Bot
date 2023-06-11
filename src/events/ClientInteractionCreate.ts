@@ -57,7 +57,7 @@ export class ClientInteractionCreate extends DiscordEvent {
             });
           } else {
             await interaction.reply({
-              content: 'Successfully deleted this webhook. See you later!'
+              content: 'Successfully deleted this webhook. You will no longer recieve messages from me. See you later!'
             });
           }
         } catch (error: any) {
@@ -89,7 +89,10 @@ export class ClientInteractionCreate extends DiscordEvent {
           } else if (result === AddWebhookResponse.ERROR) {
             await interaction.reply({ content: 'Something weird happened... I cannot process this request.' });
           } else {
-            await interaction.reply({ content: 'I got your webhook! Thanks for subscribing!' });
+            await interaction.reply({
+              content:
+                'I got your webhook! I will send you one random WoW Lore per day. You can unsubscribe at any time with /unsubscribe. Thanks for subscribing!'
+            });
           }
         } catch (error: any) {
           const errorMsg = `${this.name}: ${interaction.customId} - An error occurred: ${JSON.stringify({
