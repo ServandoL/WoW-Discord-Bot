@@ -51,7 +51,7 @@ export class MongoClientContext extends MongoClient {
       // eslint-disable-next-line @typescript-eslint/no-misused-promises
       .on('data', async (doc: WebhookDocument) => {
         logger.debug(`Got data: ${doc.data}`);
-        const data = this.decrypt(doc.data);
+        const data = this.decrypt(`${doc.data},${doc.iv}`);
         const webhookClient = new WebhookClient({
           url: data
         });
@@ -90,7 +90,8 @@ export class MongoClientContext extends MongoClient {
       const data = this.encrypt(url);
       const result = await MongoClientContext.instance.webhooksColn.insertOne({
         _id: new ObjectId(),
-        data: data.encryptedData.concat(`,${data.iv}`),
+        data: data.encryptedData,
+        iv: data.iv,
         createdDate: new Date()
       });
       if (result.acknowledged && result.insertedId) {
