@@ -71,6 +71,7 @@ export interface WebhookDocument extends WithId<Document> {
   data: string;
   iv: string;
   createdDate: Date;
+  guild: string;
 }
 
 export enum DeleteResponse {

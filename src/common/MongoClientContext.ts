@@ -86,7 +86,7 @@ export class MongoClientContext extends MongoClient {
       });
   }
 
-  public async addWebhook(url: string): Promise<AddWebhookResponse> {
+  public async addWebhook(url: string, guildName?: string): Promise<AddWebhookResponse> {
     if (!linkify.test(url)) {
       logger.warn(`User sent a bad url: ${JSON.stringify(url)}`);
       return AddWebhookResponse.BAD_URL;
@@ -97,6 +97,7 @@ export class MongoClientContext extends MongoClient {
         _id: new ObjectId(),
         data: data.encryptedData,
         iv: data.iv,
+        guild: guildName ?? '',
         createdDate: new Date()
       });
       if (result.acknowledged && result.insertedId) {

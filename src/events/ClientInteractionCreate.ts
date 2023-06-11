@@ -83,7 +83,7 @@ export class ClientInteractionCreate extends DiscordEvent {
       if (interaction.customId === 'subscribe') {
         try {
           const webhook = interaction.fields.getTextInputValue('webhookInput');
-          const result = await MongoClientContext.instance.addWebhook(webhook);
+          const result = await MongoClientContext.instance.addWebhook(webhook, interaction.guild?.name);
           if (result === AddWebhookResponse.BAD_URL) {
             await interaction.reply({ content: 'You sent me a bad url. I cannot process this request.' });
           } else if (result === AddWebhookResponse.ERROR) {
