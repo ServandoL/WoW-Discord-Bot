@@ -10,12 +10,9 @@ export async function deployCommands(): Promise<void> {
   try {
     const rest = new REST().setToken(AppConfig.instance.token);
     logger.info(`Started refreshing ${commands.length} application (/) commands.`);
-    const data = await rest.put(
-      Routes.applicationGuildCommands(AppConfig.instance.clientId, AppConfig.instance.guildId),
-      {
-        body: commands
-      }
-    );
+    const data = await rest.put(Routes.applicationCommands(AppConfig.instance.clientId), {
+      body: commands
+    });
     logger.info(`Successfully reloaded ${(data as any[]).length} application (/) commands.`);
   } catch (error) {
     const errorMsg = `An error occurred: ${JSON.stringify(error)}`;
