@@ -35,6 +35,7 @@ const baseUrl = AppConfig.instance.bnetApi;
 export async function getRandomFact(embeddedResponse: EmbedBuilder): Promise<void> {
   const enumValues = Object.values(FactChoice);
   const target = getRandomArrayElement(enumValues.filter((val) => typeof val === 'number'));
+  logger.info(`Calling random lore type: ${target}`);
   switch (target) {
     case FactChoice.ACHIEVEMENTS:
       await getAchievement(embeddedResponse);

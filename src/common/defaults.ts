@@ -1,6 +1,8 @@
 import { type APIApplicationCommandOptionChoice } from 'discord.js';
 import { FactChoice } from '../types/interfaces';
 
+export const NO_MATCH = 'No Match';
+
 export const APP_TYPE = {
   APP: 'APP',
   COMMANDS: 'COMMANDS'

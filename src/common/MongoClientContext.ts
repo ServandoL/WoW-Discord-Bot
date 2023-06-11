@@ -5,6 +5,7 @@ import crypto from 'crypto';
 import { type IEncrypted, type WebhookDocument } from '../types/interfaces';
 import { EmbedBuilder, WebhookClient } from 'discord.js';
 import { getRandomFact } from '../commands/functions/selectRandomWoWFact';
+import { NO_MATCH } from './defaults';
 
 export class MongoClientContext extends MongoClient {
   private static _instance: MongoClientContext;
@@ -58,8 +59,8 @@ export class MongoClientContext extends MongoClient {
         const embed = new EmbedBuilder();
         try {
           await getRandomFact(embed);
-        } catch (error) {
-          logger.error(`An error occurred trying to get a random fact: ${JSON.stringify(error)}`);
+        } catch (error: any) {
+          logger.error(`An error occurred trying to get a random fact: ${JSON.stringify(error.message)}`);
           return;
         }
         try {
@@ -67,8 +68,8 @@ export class MongoClientContext extends MongoClient {
             content: 'Daily WoW Lore',
             embeds: [embed]
           });
-        } catch (error) {
-          logger.error(`An error occurred trying to send the random fact: ${JSON.stringify(error)}`);
+        } catch (error: any) {
+          logger.error(`An error occurred trying to send the random fact: ${JSON.stringify(error.message)}`);
         }
       })
       .on('end', () => {
@@ -104,6 +105,29 @@ export class MongoClientContext extends MongoClient {
     }
   }
 
+  public async deleteWebhook(url: string): Promise<boolean> {
+    const cursor = MongoClientContext.instance.webhooksColn.find();
+    for await (const doc of cursor) {
+      const decrypted = this.decrypt(`${doc.data},${doc.iv}`);
+      if (decrypted !== url) {
+        continue;
+      } else {
+        try {
+          const deleted = await MongoClientContext.instance.webhooksColn.deleteOne({ _id: doc._id });
+          if (deleted.acknowledged && deleted.deletedCount) {
+            logger.info(`Successfully deleted webhook with _id: ${JSON.stringify(doc._id)}`);
+            return true;
+          }
+          return false;
+        } catch (error) {
+          logger.error(`An error occurred trying to delete webhook with _id: ${JSON.stringify(doc._id)}`);
+          return false;
+        }
+      }
+    }
+    return false;
+  }
+
   protected encrypt(text: string): IEncrypted {
     const encoding = AppConfig.instance.crypto.encoding as crypto.Encoding;
     const iv = this.generateIV();
@@ -122,17 +146,21 @@ export class MongoClientContext extends MongoClient {
   }
 
   protected decrypt(text: string): string {
-    const encoding = AppConfig.instance.crypto.encoding as BufferEncoding;
-    const input = text.split(',');
-    const key = crypto.scryptSync(
-      AppConfig.instance.crypto.password,
-      AppConfig.instance.crypto.salt,
-      AppConfig.instance.crypto.keyLen
-    );
-    const decipher = crypto.createDecipheriv(AppConfig.instance.crypto.cipher, key, Buffer.from(input[1], encoding));
-    let decrypted = decipher.update(input[0], encoding, 'utf8');
-    decrypted += decipher.final('utf8');
-    return decrypted;
+    try {
+      const encoding = AppConfig.instance.crypto.encoding as BufferEncoding;
+      const input = text.split(',');
+      const key = crypto.scryptSync(
+        AppConfig.instance.crypto.password,
+        AppConfig.instance.crypto.salt,
+        AppConfig.instance.crypto.keyLen
+      );
+      const decipher = crypto.createDecipheriv(AppConfig.instance.crypto.cipher, key, Buffer.from(input[1], encoding));
+      let decrypted = decipher.update(input[0], encoding, 'utf8');
+      decrypted += decipher.final('utf8');
+      return decrypted;
+    } catch (error) {
+      return NO_MATCH;
+    }
   }
 
   protected generateIV(): Buffer {

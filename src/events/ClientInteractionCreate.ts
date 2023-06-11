@@ -14,7 +14,7 @@ export class ClientInteractionCreate extends DiscordEvent {
         return;
       }
       try {
-        if (command.data.name === 'subscribe' && !!command.showModal) {
+        if ((command.data.name === 'subscribe' || command.data.name === 'unsubscribe') && !!command.showModal) {
           await command.showModal(interaction);
         } else {
           await command.execute(interaction);
@@ -40,9 +40,40 @@ export class ClientInteractionCreate extends DiscordEvent {
         }
       }
     } else if (interaction.isModalSubmit()) {
+      if (interaction.customId === 'unsubscribe') {
+        try {
+          const webhook = interaction.fields.getTextInputValue('webhookInput');
+          const deleted = await MongoClientContext.instance.deleteWebhook(webhook);
+          if (!deleted) {
+            await interaction.reply({
+              content: 'There was an error while handling this request. Please try again later or contact support.'
+            });
+          }
+          await interaction.reply({
+            content: 'Successfully deleted this webhook. See you later!'
+          });
+        } catch (error: any) {
+          const errorMsg = `${this.name}: ${interaction.customId} - An error occurred: ${JSON.stringify({
+            error: error.message
+          })}`;
+          logger.error(errorMsg);
+          if (interaction.replied || interaction.deferred) {
+            await interaction.followUp({
+              content: 'There was an error while executing this command!',
+              ephemeral: true
+            });
+            logger.error(errorMsg);
+          } else {
+            await interaction.reply({
+              content: 'There was an error while executing this command!',
+              ephemeral: true
+            });
+            logger.error(errorMsg);
+          }
+        }
+      }
       if (interaction.customId === 'subscribe') {
         try {
-          // TODO: Logic to store encrypted webhook in mongodb
           const webhook = interaction.fields.getTextInputValue('webhookInput');
           await MongoClientContext.instance.addWebhook(webhook);
           await interaction.reply({ content: 'Thanks for subscribing!' });
