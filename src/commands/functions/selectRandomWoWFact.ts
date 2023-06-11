@@ -331,7 +331,7 @@ export async function getSpecialization(embeddedResponse: EmbedBuilder): Promise
     `${baseUrl}/data/wow/playable-specialization/index`
   );
   const randomSpec = getRandomArrayElement(specIndex.character_specializations);
-  logger.log(`Calling ${randomSpec.key.href}`);
+  logger.info(`Calling ${randomSpec.key.href}`);
   const specById: SpecByIdApiResponse = await BnetHttpClient.instance.get(randomSpec.key.href);
   const specDisplay: BnetMediaDisplay | undefined = await BnetHttpClient.instance.get(specById.media.key.href);
   const fields: EmbedBuilderFields[] = [];
@@ -367,7 +367,7 @@ export async function getSpecialization(embeddedResponse: EmbedBuilder): Promise
 export async function getPlayableRace(embeddedResponse: EmbedBuilder): Promise<void> {
   const raceIndex: RaceIndexApiResponse = await BnetHttpClient.instance.get(`${baseUrl}/data/wow/playable-race/index`);
   const randomRace = getRandomArrayElement(raceIndex.races);
-  logger.log(`Calling ${randomRace.key.href}`);
+  logger.info(`Calling ${randomRace.key.href}`);
   const raceById: RaceByIdApiResponse = await BnetHttpClient.instance.get(randomRace.key.href);
   if (raceById.name.en_US) {
     embeddedResponse.setTitle(

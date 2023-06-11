@@ -3,6 +3,7 @@ import { DiscordEvent } from './class/DiscordEvent';
 import { logger } from '../logger';
 import { type DiscordClient } from '../common/DiscordClient';
 import { MongoClientContext } from '../common/MongoClientContext';
+import { AddWebhookResponse, DeleteResponse } from '../types/interfaces';
 
 export class ClientInteractionCreate extends DiscordEvent {
   protected _name: string;
@@ -43,15 +44,22 @@ export class ClientInteractionCreate extends DiscordEvent {
       if (interaction.customId === 'unsubscribe') {
         try {
           const webhook = interaction.fields.getTextInputValue('webhookInput');
-          const deleted = await MongoClientContext.instance.deleteWebhook(webhook);
-          if (!deleted) {
+          const result = await MongoClientContext.instance.deleteWebhook(webhook);
+          if (result === DeleteResponse.ERROR) {
             await interaction.reply({
-              content: 'There was an error while handling this request. Please try again later or contact support.'
+              content: 'There was an error while handling this request. Please try again or contact support.',
+              ephemeral: true
+            });
+          } else if (result === DeleteResponse.NOT_FOUND) {
+            await interaction.reply({
+              content: 'I could not find this webhook. Please try again or contact support.',
+              ephemeral: true
+            });
+          } else {
+            await interaction.reply({
+              content: 'Successfully deleted this webhook. See you later!'
             });
           }
-          await interaction.reply({
-            content: 'Successfully deleted this webhook. See you later!'
-          });
         } catch (error: any) {
           const errorMsg = `${this.name}: ${interaction.customId} - An error occurred: ${JSON.stringify({
             error: error.message
@@ -75,8 +83,14 @@ export class ClientInteractionCreate extends DiscordEvent {
       if (interaction.customId === 'subscribe') {
         try {
           const webhook = interaction.fields.getTextInputValue('webhookInput');
-          await MongoClientContext.instance.addWebhook(webhook);
-          await interaction.reply({ content: 'Thanks for subscribing!' });
+          const result = await MongoClientContext.instance.addWebhook(webhook);
+          if (result === AddWebhookResponse.BAD_URL) {
+            await interaction.reply({ content: 'You sent me a bad url. I cannot process this request.' });
+          } else if (result === AddWebhookResponse.ERROR) {
+            await interaction.reply({ content: 'Something weird happened... I cannot process this request.' });
+          } else {
+            await interaction.reply({ content: 'I got your webhook! Thanks for subscribing!' });
+          }
         } catch (error: any) {
           const errorMsg = `${this.name}: ${interaction.customId} - An error occurred: ${JSON.stringify({
             error: error.message

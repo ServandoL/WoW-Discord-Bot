@@ -2,11 +2,11 @@ import { type Collection, MongoClient, type MongoClientOptions, ObjectId } from 
 import { AppConfig } from '../AppConfig';
 import { logger } from '../logger';
 import crypto from 'crypto';
-import { type IEncrypted, type WebhookDocument } from '../types/interfaces';
+import { AddWebhookResponse, DeleteResponse, type IEncrypted, type WebhookDocument } from '../types/interfaces';
 import { EmbedBuilder, WebhookClient } from 'discord.js';
 import { getRandomFact } from '../commands/functions/selectRandomWoWFact';
 import { NO_MATCH } from './defaults';
-
+import * as linkify from 'linkifyjs';
 export class MongoClientContext extends MongoClient {
   private static _instance: MongoClientContext;
 
@@ -86,7 +86,11 @@ export class MongoClientContext extends MongoClient {
       });
   }
 
-  public async addWebhook(url: string): Promise<void> {
+  public async addWebhook(url: string): Promise<AddWebhookResponse> {
+    if (!linkify.test(url)) {
+      logger.warn(`User sent a bad url: ${JSON.stringify(url)}`);
+      return AddWebhookResponse.BAD_URL;
+    }
     try {
       const data = this.encrypt(url);
       const result = await MongoClientContext.instance.webhooksColn.insertOne({
@@ -97,15 +101,18 @@ export class MongoClientContext extends MongoClient {
       });
       if (result.acknowledged && result.insertedId) {
         logger.info(`Successfully inserted a new webhook with _id: ${JSON.stringify(result.insertedId)}`);
+        return AddWebhookResponse.SUCCESS;
       } else {
         logger.warn('I could not insert a new webhook for some reason?');
+        return AddWebhookResponse.ERROR;
       }
     } catch (error) {
       logger.error(`An error occurred trying to encrypt the data. ${JSON.stringify(error)}`);
+      return AddWebhookResponse.ERROR;
     }
   }
 
-  public async deleteWebhook(url: string): Promise<boolean> {
+  public async deleteWebhook(url: string): Promise<DeleteResponse> {
     const cursor = MongoClientContext.instance.webhooksColn.find();
     for await (const doc of cursor) {
       const decrypted = this.decrypt(`${doc.data},${doc.iv}`);
@@ -116,16 +123,16 @@ export class MongoClientContext extends MongoClient {
           const deleted = await MongoClientContext.instance.webhooksColn.deleteOne({ _id: doc._id });
           if (deleted.acknowledged && deleted.deletedCount) {
             logger.info(`Successfully deleted webhook with _id: ${JSON.stringify(doc._id)}`);
-            return true;
+            return DeleteResponse.FOUND;
           }
-          return false;
+          return DeleteResponse.NOT_FOUND;
         } catch (error) {
           logger.error(`An error occurred trying to delete webhook with _id: ${JSON.stringify(doc._id)}`);
-          return false;
+          return DeleteResponse.ERROR;
         }
       }
     }
-    return false;
+    return DeleteResponse.NOT_FOUND;
   }
 
   protected encrypt(text: string): IEncrypted {

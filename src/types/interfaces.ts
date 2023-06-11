@@ -71,3 +71,15 @@ export interface WebhookDocument extends WithId<Document> {
   iv: string;
   createdDate: Date;
 }
+
+export enum DeleteResponse {
+  NOT_FOUND,
+  FOUND,
+  ERROR
+}
+
+export enum AddWebhookResponse {
+  ERROR,
+  BAD_URL,
+  SUCCESS
+}

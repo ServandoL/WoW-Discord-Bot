@@ -4,6 +4,7 @@ import { PrivacyPolicy } from './PrivacyPolicy';
 import { SelectRandomWoWFact } from './SelectRandomWoWFact';
 import { Server } from './Server';
 import { Subscribe } from './Subscribe';
+import { Support } from './Support';
 import { Unsubscribe } from './Unsubscribe';
 import { User } from './User';
 
@@ -24,7 +25,8 @@ export class Commands {
       new SelectRandomWoWFact(),
       new PrivacyPolicy(),
       new Subscribe(),
-      new Unsubscribe()
+      new Unsubscribe(),
+      new Support()
     ];
   }
 }
