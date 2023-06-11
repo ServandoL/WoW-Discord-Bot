@@ -1,4 +1,4 @@
-import { type ApplicationConfiguration } from './types/interfaces';
+import { type Cipher, type ApplicationConfiguration } from './types/interfaces';
 
 export class AppConfig {
   private static _instance: AppConfig;
@@ -15,7 +15,21 @@ export class AppConfig {
       bnetApi: process.env.BNET_API ?? '',
       port: process.env.PORT ?? '8080',
       type: process.env.TYPE ?? 'APP',
-      logLevel: process.env.LOG_LEVEL ?? 'info'
+      logLevel: process.env.LOG_LEVEL ?? 'info',
+      mongo: {
+        mongoUrl: process.env.MONGO_URL ?? '',
+        lorebotDb: process.env.LOREBOT_DB ?? '',
+        webhooksColn: process.env.WEBHOOKS_COLN ?? ''
+      },
+      crypto: {
+        cipher: process.env.CIPHER ?? '',
+        password: process.env.PASSWORD ?? '',
+        salt: process.env.SALT ?? '',
+        keyLen: process.env.KEYLEN ? +process.env.KEYLEN : 0,
+        encoding: process.env.ENCODING ?? '',
+        bytes: process.env.BYTE_SIZE ? +process.env.BYTE_SIZE : 0
+      },
+      dailyCron: process.env.DAILY_CRON_SCHEDULER ?? ''
     };
   }
 
@@ -24,6 +38,33 @@ export class AppConfig {
       AppConfig._instance = new AppConfig();
     }
     return AppConfig._instance;
+  }
+
+  public get dailyCron(): string {
+    return AppConfig.instance._applicationConfigs.dailyCron;
+  }
+
+  public get crypto(): Cipher {
+    return {
+      cipher: AppConfig.instance._applicationConfigs.crypto.cipher,
+      password: AppConfig.instance._applicationConfigs.crypto.password,
+      salt: AppConfig.instance._applicationConfigs.crypto.salt,
+      keyLen: AppConfig.instance._applicationConfigs.crypto.keyLen,
+      encoding: AppConfig.instance._applicationConfigs.crypto.encoding,
+      bytes: AppConfig.instance._applicationConfigs.crypto.bytes
+    };
+  }
+
+  public get mongoUrl(): string {
+    return AppConfig.instance._applicationConfigs.mongo.mongoUrl;
+  }
+
+  public get lorebotDb(): string {
+    return AppConfig.instance._applicationConfigs.mongo.lorebotDb;
+  }
+
+  public get webhooksColn(): string {
+    return AppConfig.instance._applicationConfigs.mongo.webhooksColn;
   }
 
   public get logLevel(): string {

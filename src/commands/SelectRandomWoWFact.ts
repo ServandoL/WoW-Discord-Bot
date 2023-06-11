@@ -1,5 +1,5 @@
-import { SlashCommandBuilder, type ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
-import { SlashCommand } from './class/SlashCommand';
+import { SlashCommandBuilder, type ChatInputCommandInteraction, EmbedBuilder, type Interaction } from 'discord.js';
+import { type SlashCommand } from './interface/SlashCommand';
 import { RANDOM_CHOICES } from '../common/defaults';
 import { FactChoice } from '../types/interfaces';
 import {
@@ -19,20 +19,22 @@ import {
 } from './functions/selectRandomWoWFact';
 import { logger } from '../logger';
 
-export class SelectRandomWoWFact extends SlashCommand {
+export class SelectRandomWoWFact implements SlashCommand {
   data: SlashCommandBuilder;
 
-  async execute(interaction: ChatInputCommandInteraction): Promise<void> {
-    const target = interaction.options.getNumber('category');
-    await interaction.deferReply();
+  async execute(interaction: Interaction): Promise<void> {
+    const target = (interaction as ChatInputCommandInteraction).options.getNumber('category');
+    await (interaction as ChatInputCommandInteraction).deferReply();
     const embeddedResponse = new EmbedBuilder();
     switch (target) {
       case FactChoice.ACHIEVEMENTS:
         await getAchievement(embeddedResponse);
         break;
-      case FactChoice.CREATURE:
-        await interaction.editReply('Sorry, but CREATURE is not implemented yet. Go away.');
-        throw new Error('Not implemented.');
+      // case FactChoice.CREATURE:
+      //   await (interaction as ChatInputCommandInteraction).editReply(
+      //     'Sorry, but CREATURE is not implemented yet. Go away.'
+      //   );
+      //   throw new Error('Not implemented.');
       case FactChoice.HEIRLOOM:
         await getHeirloom(embeddedResponse);
         break;
@@ -54,10 +56,10 @@ export class SelectRandomWoWFact extends SlashCommand {
       case FactChoice.QUEST:
         await getQuest(embeddedResponse);
         break;
-      case FactChoice.SPELL:
-        // eslint-disable-next-line quotes
-        await interaction.editReply("I CAN'T CAST THIS YET. Go away.");
-        throw new Error('Not implemented.');
+      // case FactChoice.SPELL:
+      //   // eslint-disable-next-line quotes
+      //   await (interaction as ChatInputCommandInteraction).editReply("I CAN'T CAST THIS YET. Go away.");
+      //   throw new Error('Not implemented.');
       case FactChoice.REP:
         await getReputation(embeddedResponse);
         break;
@@ -74,14 +76,17 @@ export class SelectRandomWoWFact extends SlashCommand {
         await getClass(embeddedResponse);
         break;
       default:
-        logger.warn(`${interaction.commandName}: ${target?.toString() ?? ''} is not a valid entry.`);
-        await interaction.editReply('Your entry is not valid. Please try again');
+        logger.warn(
+          `${(interaction as ChatInputCommandInteraction).commandName}: ${
+            target?.toString() ?? ''
+          } is not a valid entry.`
+        );
+        await (interaction as ChatInputCommandInteraction).editReply('Your entry is not valid. Please try again');
     }
-    await interaction.editReply({ embeds: [embeddedResponse] });
+    await (interaction as ChatInputCommandInteraction).editReply({ embeds: [embeddedResponse] });
   }
 
   constructor() {
-    super();
     this.data = new SlashCommandBuilder()
       .setName('lore')
       .setDescription('Response with a random world of warcraft lore.');

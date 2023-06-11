@@ -21,7 +21,7 @@ export class BnetHttpClient extends AuthContext {
   }
 
   public async get(url: string): Promise<any> {
-    logger.debug(`Calling ${url}`);
+    logger.info(`Calling ${url}`);
     const token = await this.getToken();
     const { body } = await request(url, {
       headers: {
