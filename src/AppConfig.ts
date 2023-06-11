@@ -28,7 +28,8 @@ export class AppConfig {
         keyLen: process.env.KEYLEN ? +process.env.KEYLEN : 0,
         encoding: process.env.ENCODING ?? '',
         bytes: process.env.BYTE_SIZE ? +process.env.BYTE_SIZE : 0
-      }
+      },
+      dailyCron: process.env.DAILY_CRON_SCHEDULER ?? ''
     };
   }
 
@@ -37,6 +38,10 @@ export class AppConfig {
       AppConfig._instance = new AppConfig();
     }
     return AppConfig._instance;
+  }
+
+  public get dailyCron(): string {
+    return AppConfig.instance._applicationConfigs.dailyCron;
   }
 
   public get crypto(): Cipher {

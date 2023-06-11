@@ -38,6 +38,7 @@ export interface ApplicationConfiguration {
   logLevel: string;
   mongo: MongoClientConfiguration;
   crypto: Cipher;
+  dailyCron: string;
 }
 
 export interface Cipher {

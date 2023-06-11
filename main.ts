@@ -47,18 +47,20 @@ export default async function startDiscordApp(): Promise<void> {
       }
     });
 
-    // TODO: Send a random fact every day
-    cron.schedule('* * * * *', () => {
-      logger.info('task every minute');
-      MongoClientContext.instance
-        .sendRandomLore()
-        .then(() => {
-          logger.info('Done sending lore.');
-        })
-        .catch((error) => {
-          logger.error(JSON.stringify(error));
-        });
-    });
+    // * Send a random fact every day
+    cron
+      .schedule(AppConfig.instance.dailyCron, () => {
+        logger.info('Scheduled daily job.');
+        MongoClientContext.instance
+          .sendRandomLore()
+          .then(() => {
+            logger.info('Done sending lore.');
+          })
+          .catch((error) => {
+            logger.error(JSON.stringify(error));
+          });
+      })
+      .start();
 
     // Log in to Discord with client token
     DiscordClient.instance.login(AppConfig.instance.token).catch((error) => {
