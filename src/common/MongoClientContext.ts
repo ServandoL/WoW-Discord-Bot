@@ -46,6 +46,13 @@ export class MongoClientContext extends MongoClient {
   }
 
   public async sendRandomLore(): Promise<void> {
+    const embed = new EmbedBuilder();
+    try {
+      await getRandomFact(embed);
+    } catch (error: any) {
+      logger.error(`An error occurred trying to get a random fact: ${JSON.stringify(error.message)}`);
+      return;
+    }
     const cursor = MongoClientContext.instance.webhooksColn.find();
     cursor
       .stream()
@@ -56,13 +63,6 @@ export class MongoClientContext extends MongoClient {
         const webhookClient = new WebhookClient({
           url: data
         });
-        const embed = new EmbedBuilder();
-        try {
-          await getRandomFact(embed);
-        } catch (error: any) {
-          logger.error(`An error occurred trying to get a random fact: ${JSON.stringify(error.message)}`);
-          return;
-        }
         try {
           await webhookClient.send({
             content: 'Daily WoW Lore',
