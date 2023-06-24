@@ -1,5 +1,14 @@
 import { type Document, type WithId } from 'mongodb';
 
+export enum DailyFactChoice {
+  ACHIEVEMENTS,
+  MOUNT,
+  PET,
+  REP,
+  TOY,
+  TITLE
+}
+
 export enum FactChoice {
   ACHIEVEMENTS,
   // CREATURE,
